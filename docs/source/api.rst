@@ -2,5 +2,5 @@ API Documentation
 =================
 
 .. automodule:: pylecroy
-   :members:
-
+    :members:
+    :private-members:

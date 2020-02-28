@@ -1,0 +1,38 @@
+default:
+    image: python:3.6
+
+stages:
+    - build
+    - test
+    - deploy
+
+before_script:
+    - echo "Initialize environment"
+    - apt-get update -qy
+    - apt-get install -y python-dev python-pip
+    - apt-get install -y python3-sphinx
+    - pip install -r requirements.txt
+
+doc:
+    stage: build
+    script:
+    - echo "Generate sphinx documentation"
+    - cd ./docs
+    - make html
+    - cd ../
+    artifacts:
+        name: $CI_PROJECT_NAME-$CI_JOB_STAGE-$CI_JOB_ID-$CI_COMMIT_REF_NAME
+        paths:
+            - ./docs/build/html
+
+test:
+    stage: test
+    script:
+    - echo "test phase"
+
+production:
+    stage: deploy
+    script:
+    - echo "deploy phase"
+    only:
+        - tags
