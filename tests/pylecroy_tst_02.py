@@ -1,15 +1,58 @@
 from pylecroy import PyLecroy
-import time
+import sys
+import logging
+
+VERSION = '1.0'
+
+USAGE = '''pylecroy_tst_02: execute the lecroy test 02
+Usage:
+    python pylecroy_tst_02.py [options]
+
+Options:
+    -h, --help              this help message.
+    -v, --version           version info.
+    -l, --logging           enable logging
+    -a, --address           device IP address
+'''
 
 
-SCOPE_LASER = "10.67.16.25"
-SCOPE_SCA = "10.67.16.22"
-SCOPE_EMFI = ""
-ADDRESS = SCOPE_LASER
+def main(argv=None):
+    import getopt
 
-if __name__ == '__main__':
+    if argv is None:
+        argv = sys.argv[1:]
+    try:
+        opts, args = getopt.gnu_getopt(argv, 'hvla:', ['help', 'version', 'logging', 'address='])
+        address = None
+        log = False
 
-    scope = PyLecroy(ADDRESS)
+        for o, a in opts:
+            if o in ('-h', '--help'):
+                print(USAGE)
+                return 0
+            if o in ('-v', '--version'):
+                print(VERSION)
+                return 0
+            elif o in ('-l', '--logging'):
+                log = True
+            elif o in ('-a', '--address'):
+                address = a
+
+    except getopt.GetoptError:
+        e = sys.exc_info()[1]  # current exception
+        sys.stderr.write(str(e) + "\n")
+        sys.stderr.write(USAGE + "\n")
+        return 1
+
+    # Load default value
+    if address is None:
+        sys.stderr.write("scope address is mandatory..."+ "\n")
+        sys.stderr.write(USAGE + "\n")
+
+    if log is True:
+        logging.basicConfig(level=logging.INFO)
+
+    scope = PyLecroy(address)
 
     # Test identify
     scope.identify()
@@ -48,3 +91,7 @@ if __name__ == '__main__':
     scope.show_trace(scope.M1, "ON")
 
     scope.close()
+
+
+if __name__ == '__main__':
+    sys.exit(main())

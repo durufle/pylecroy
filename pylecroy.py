@@ -49,6 +49,7 @@ class PyLecroy:
     GRID_STATE = (AUTO, SINGLE, DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE, SIXTEEN, TRIPLE, HEX)
     SETUP_SLOT = (S1, S2, S3, S4, S5, S6)
 
+
     def __init__(self, address):
         self._address = None
         self._is0pen = False
@@ -318,6 +319,9 @@ class PyLecroy:
 
             if not self._instance.WriteString("TRMD " + mode, True):
                 self._logger.warning("set trigger mode command failed...")
+            # Waiting scope available...
+            while self._instance.WaitForOPC() != 1:
+                pass
 
     def get_trigger_mode(self):
         """
