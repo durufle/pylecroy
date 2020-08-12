@@ -23,5 +23,5 @@ setup(name='pylecroy',
       python_requires='>=3.6',
       license='MIT',
       packages=find_packages(),
-      install_requires=['numpy', 'win32com', 'matplotlib'],
+      install_requires=['numpy', 'pywin32', 'matplotlib'],
       zip_safe=True)
