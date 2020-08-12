@@ -2,3 +2,5 @@ __pycache__
 docs/build
 *.pyc
 dist
+build
+*egg*
