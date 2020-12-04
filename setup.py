@@ -2,7 +2,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 setup(name='pylecroy',
-      version='0.0.0',
+      version='0.1.0',
       
       description='Lecroy oscilloscope driver',
       long_description=open('README.md').read(),
