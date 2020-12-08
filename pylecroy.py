@@ -215,7 +215,7 @@ class PyLecroy:
         :param name: file name
         :return:
         """
-        if not self._instance.StoreHardcopyToFile("BMP", "", name):
+        if not self._instance.StoreHardcopyToFile("BMP", "BCKG, WHITE", name):
             self._logger.warning("hardcopy failed...")
 
     # ----------------------------------------------------------------------- #
