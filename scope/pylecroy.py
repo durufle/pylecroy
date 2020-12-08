@@ -15,6 +15,9 @@ class PyLecroy:
     Class to drive a Lecroy oscilloscope using ActiveDSO active X
 
     """
+    version = "0.1.1"
+    __version__ = version
+
     # scope mode
     LOCAL, REMOTE = (0, 1)
     # trigger , grid mode
