@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 
-from pylecroy import PyLecroy
+from pylecroy.scope.pylecroy import PyLecroy
 import logging
 import sys
 
-SCOPE_LASER = "10.67.16.208"
+SCOPE_LASER = "10.67.16.21"
 SCOPE_SCA = "10.67.16.22"
-SCOPE_EMFI = "10.67.16.24"
 ADDRESS = SCOPE_LASER
 
 VERSION = '1.0'
 
 USAGE = '''example_a: execute the lecroy class example a
 Usage:
-    python example_a.py [options]
+    python example_a.py -a 10.67.16.22
 
 Options:
     -h, --help              this help message.
@@ -53,7 +52,9 @@ def main(argv=None):
 
     # Load default value
     if address is None:
-        address = SCOPE_LASER
+        print("scope IP address must be provide...")
+        print(USAGE)
+        return 2
 
     if log is True:
         logging.basicConfig(level=logging.INFO)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pylecroy import PyLecroy
+from pylecroy.scope.pylecroy import PyLecroy
 import logging
 import sys
 import intelhex

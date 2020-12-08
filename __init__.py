@@ -1,2 +1,0 @@
-from .pylecroy import PyLecroy
-

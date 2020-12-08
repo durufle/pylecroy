@@ -15,7 +15,7 @@ setup(name='pylecroy',
         'Intended Audience :: Developers',
       ],
       
-      keywords='avtech',
+      keywords='lecroy',
       
       url='https://git.ul-ts.com/ims-se/hardware-team/pybench/pylecroy',
       author='Laurent Bonnet',

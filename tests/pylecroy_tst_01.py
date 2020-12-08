@@ -1,4 +1,4 @@
-from pylecroy import PyLecroy
+from pylecroy.scope.pylecroy import PyLecroy
 import sys
 import logging
 
