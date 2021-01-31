@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class PyLecroy:
+class Lecroy:
     """
     Class to drive a Lecroy oscilloscope using ActiveDSO active X
 

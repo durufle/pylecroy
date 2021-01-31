@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pylecroy.scope.pylecroy import PyLecroy
+from scope.pylecroy import Lecroy
 import logging
 import sys
 
