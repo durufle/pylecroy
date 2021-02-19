@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from scope.pylecroy import Lecroy
+from pylecroy.pylecroy import Lecroy
 import logging
 import sys
 
@@ -59,7 +59,7 @@ def main(argv=None):
     if log is True:
         logging.basicConfig(level=logging.INFO)
 
-    scope = PyLecroy(address)
+    scope = Lecroy(address)
 
     # Get scope identifier identify
     scope.identify()
