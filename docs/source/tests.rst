@@ -1,22 +1,15 @@
 Tests
-========
-Unit test scripts can be found in :file:`pylecroy/tests` directory.
+=====
+
+Unit test scripts can be found in **pylecroy/tests** directory.
 In order to execute theses scripts, a connection with a Lecroy device should be setup.
 
-pylecroy_tst_01
----------------
-Unit test on trigger relative commands.
+See:
 
-See :download:`../../tests/pylecroy_tst_01.py`.
+- :download:`../../tests/pylecroy_tst_00.py`.
 
-pylecroy_tst_02
----------------
-Unit test on channel relative commands.
+- :download:`../../tests/pylecroy_tst_01.py`.
 
-See :download:`../../tests/pylecroy_tst_02.py`.
+- :download:`../../tests/pylecroy_tst_02.py`.
 
-pylecroy_tst_03
----------------
-Unit test on hardcopy relative commands.
-
-See :download:`../../tests/pylecroy_tst_03.py`.
+- :download:`../../tests/pylecroy_tst_03.py`.

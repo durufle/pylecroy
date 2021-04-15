@@ -70,4 +70,10 @@ Note that package will be used by other people, so stability matters.
     If the implementation is easy to explain, it may be a good idea.
     Namespaces are one honking great idea -- let's do more of those!
 
-In order to update the documentation, you need :program:`sphinx`.
+In order to update the documentation, you need :program:`sphinx` and sphinx_rts_theme.
+
+To generate python package in wheel format and generate sphinx documentation:
+
+.. code-block:: bash
+
+    $ python setup.py bdist_wheel build_sphinx

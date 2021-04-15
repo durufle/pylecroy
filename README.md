@@ -1,16 +1,14 @@
-pylecroy: python package for lecroy
-===================================
+# pylecroy: python package for lecroy
 
-This package use the ActiveDSO active X control from lecroy, you need to install it in your PC workstation.
+This package use the [ActiveDSO](https://teledynelecroy.com/support/softwaredownload/activedso.aspx) active X control version 2.36 from lecroy. 
 
-In order to interface python with COM object, you need to install win32com package.
 
-* `pywin32 <https://pypi.org/project/pywin32/>`_
+In order to interface python with COM object, you need to install [pywin32](https://pypi.org/project/pywin32/) package.
 
-The following packages are also needed:
 
-* `numpy <https://numpy.org/>`_
-* `matplotlib <https://matplotlib.org/>`_
+The following packages are also needed: [numpy](https://numpy.org/) and 
+[matplotlib](https://matplotlib.org/)
 
 This version can be used only on Windows station.
+
 

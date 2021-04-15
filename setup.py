@@ -1,21 +1,32 @@
 from setuptools import setup
 from setuptools import find_packages
 from os import path
+from sphinx.setup_command import BuildDoc
+
+name = 'pylecroy'
+version = '0.1.1'
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-setup(name='pylecroy',
-      version='0.1.1',
-      
+setup(name=name,
+      version=version,
+      cmdclass={'build_sphinx': BuildDoc},
+      command_options={
+          'build_sphinx': {
+              'project': ('setup.py', name),
+              'version': ('setup.py', version),
+              'source_dir': ('setup.py', 'docs/source')
+          }
+      },
       description='Lecroy oscilloscope driver',
       long_description=long_description,
       long_description_content_type='text/markdown',
 
       classifiers=[
         'License :: OSI Approved ::  Massachusetts Institute of Technology (MIT)',
-        'Operating System :: OS Independent',
+        'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3',
         'Topic :: Device driver',
         'Intended Audience :: Developers',
