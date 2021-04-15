@@ -16,14 +16,13 @@ before_script:
 doc:
     stage: build
     script:
-    - echo "Generate sphinx documentation"
-    - cd ./docs
-    - make html
-    - cd ../
+    - echo "Generate package and sphinx documentation"
+    - python setup.py bdist_wheel build_sphinx
     artifacts:
         name: $CI_PROJECT_NAME-$CI_JOB_STAGE-$CI_JOB_ID-$CI_COMMIT_REF_NAME
         paths:
-            - ./docs/build/html
+            - ./dist
+            - ./build/sphinx/html
 
 test:
     stage: test
