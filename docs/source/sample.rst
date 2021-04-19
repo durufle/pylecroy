@@ -7,7 +7,7 @@ example_a
 ---------
 Basic example, showing how to connect and get some device parameter values.
 
-See :download:`../../examples/example_a.py`.
+See ::file:`../../examples/example_a.py`.
 
 .. code-block:: python
 
