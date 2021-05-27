@@ -1,3 +1,9 @@
-Sphinx==2.2.1
+Sphinx
 sphinx-rtd-theme
+numpy
+matplotlib
+numpy
 wheel
+devpi-web
+devpi-client
+bump2version
