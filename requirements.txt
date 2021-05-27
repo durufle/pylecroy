@@ -2,6 +2,7 @@ Sphinx
 sphinx-rtd-theme
 numpy
 matplotlib
+pywin32
 numpy
 wheel
 devpi-web
