@@ -14,6 +14,7 @@ Welcome to PyLecroy's documentation!
    ./api.rst
    ./sample.rst
    ./tests.rst
+   ./utils.rst
 
 Indices and tables
 ==================

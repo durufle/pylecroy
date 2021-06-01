@@ -33,7 +33,11 @@ setup(name=name,
         'Topic :: Device driver',
         'Intended Audience :: Developers',
       ],
-      
+
+      entry_points={
+          'console_scripts': ['lecroy_info = bin.lecroy_info:main'],
+      },
+
       keywords='lecroy',
       
       url='https://git.ul-ts.com/ims-se/hardware-team/pybench/pylecroy',
@@ -42,5 +46,5 @@ setup(name=name,
       python_requires='>=3.6',
       license='MIT',
       packages=find_packages(),
-      install_requires=['numpy', 'pywin32', 'matplotlib'],
+      install_requires=['numpy', 'pywin32==300', 'matplotlib'],
       zip_safe=False)

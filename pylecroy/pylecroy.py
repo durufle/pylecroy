@@ -47,6 +47,7 @@ class Lecroy:
     WAVEFORM_CHANNELS = (C1, C2, C3, C4, Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, F1, F2, F3, F4, F5, F6, F7, F8)
     INTERNAL_MEMORY = (M1, M2, M3, M4)
     DISPLAY_STATE = (ON, OFF)
+    AUTO_CALIBRATION = (ON, OFF)
     TRACE_STATE = DISPLAY_STATE
     TRACE_CHANNELS = WAVEFORM_CHANNELS
     GRID_STATE = (AUTO, SINGLE, DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE, SIXTEEN, TRIPLE, HEX)
@@ -235,7 +236,7 @@ class Lecroy:
     # ----------------------------------------------------------------------- #
 
     def delete_hardcopy(self, name):
-        """ delete an hardcopy file in scope"""
+        raise NotImplemented
 
     # ----------------------------------------------------------------------- #
     def set_waveform_transfer(self, first_point):
@@ -249,11 +250,11 @@ class Lecroy:
         """
         Get a wave from scope, and return it
 
-        :param mode:
-        :param name:
-        :param max_bytes:
-        :param first_byte:
-        :return:
+        :param mode: mode (BYTE, INTEGER, SCALED, NATIVE)
+        :param name: channel name
+        :param max_bytes: maximum byte
+        :param first_byte: first byte index
+        :return: list of waveform values
         """
         if mode not in self.WAVEFORM_MODES:
             raise ValueError("Not a valid get waveform mode...")
@@ -322,7 +323,7 @@ class Lecroy:
             if not self._instance.WriteString("TRMD " + mode, True):
                 self._logger.warning("set trigger mode command failed...")
             # Waiting scope available...
-            while self._instance.WaitForOPC() != 1:
+            while not self._instance.WaitForOPC():
                 pass
 
     def get_trigger_mode(self):
@@ -477,6 +478,23 @@ class Lecroy:
             self._calibration = self._instance.ReadString(10)
         else:
             self._logger.warning("Calibration command failed...")
+
+    def set_auto_calibration(self, state):
+        """
+        Enable / Disable Auto calibration
+
+        :param state: ON or OFF
+        :exception: ValueError: Auto calibration state value not supported
+        """
+        if state not in self.AUTO_CALIBRATION:
+            raise ValueError("Auto calibration state not supported...")
+        cmd = "AUTO_CALIBRATE {0}".format(state)
+        self._instance.WriteString(cmd, True)
+
+    def get_auto_calibration(self):
+        cmd = "AUTO_CALIBRATE?"
+        if  self._instance.WriteString(cmd, True):
+            return self._instance.ReadString(3)
 
     @property
     def identifier(self):
