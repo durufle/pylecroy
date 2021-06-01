@@ -4,7 +4,7 @@ from os import path
 from sphinx.setup_command import BuildDoc
 
 name = 'pylecroy'
-version = '0.1.1'
+version = '0.1.2'
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:

@@ -1,5 +1,10 @@
 **unreleased**
 
+**v0.1.2**
+- Correction on a wrong WaitOPC method usage
+- Install executable script during package install
+- No API modification
+
 **v0.1.1**
 - Hotfix. Change project architecture for package installation issue. No functional changes.
 

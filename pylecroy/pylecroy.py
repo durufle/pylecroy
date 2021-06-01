@@ -15,7 +15,7 @@ class Lecroy:
     Class to drive a Lecroy oscilloscope using ActiveDSO active X
 
     """
-    version = "0.1.1"
+    version = "0.1.2"
     __version__ = version
 
     # scope mode
