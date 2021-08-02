@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-from pylecroy.scope.pylecroy import PyLecroy
+from pylecroy.pylecroy import Lecroy
 import logging
 import sys
-import intelhex
 
 VERSION = '1.0'
 
@@ -55,7 +54,7 @@ def main(argv=None):
     if log is True:
         logging.basicConfig(level=logging.INFO)
 
-    scope = PyLecroy(address)
+    scope = Lecroy(address)
 
     # Test identify
     scope.identify()
@@ -85,16 +84,16 @@ def main(argv=None):
     scope.show_grid(scope.SINGLE)
     print("ALL Waveform OFF...")
     for trace in scope.TRACE_CHANNELS:
-        scope.show_trace(trace, scope.OFF)
-    input("Set calibration signal to C1 and Press a key to continue...")
-    # Visualize C1
-    scope.show_trace(scope.C1, scope.ON)
-    scope.show_trace(scope.Z1, scope.ON)
-    input("Select Z1 area and Press a key to continue...")
+        scope.display_channel(trace, scope.OFF)
+    input("Set calibration signal to C2 and Press a key to continue...")
+    # Visualize C2
+    scope.display_channel(scope.C2, scope.ON)
+    # scope.display_channel(scope.Z1, scope.ON)
+    # input("Select Z1 area and Press a key to continue...")
     # save Z1 to M1
-    scope.save_memory(scope.Z1, scope.M1)
-    # scope.get_wave_to_file("./test_full.bin", scope.BYTE, scope.C1, 2000000)
-    # scope.display_wave("./test_full.bin")
+    # scope.save_memory(scope.Z1, scope.M1)
+    scope.get_wave_to_file("./test_full.bin", scope.BYTE, scope.C2, 2000000)
+    scope.display_wave("./test_full.bin")
     # scope.get_wave_to_file("./test_partial.bin", scope.BYTE, scope.C1, 2000000, 1000000)
     # scope.get_wave_to_file("./test_full_z1.bin", scope.BYTE, scope.Z1, 1000000, 500000)
     # scope.display_wave("./test_full_z1.bin")

@@ -57,6 +57,8 @@ def main(argv=None):
     scope.get_trigger_mode()
     print("get trigger mode             : {} ".format(scope.trigger_mode))
     print("get auto calibration         : {} ".format(scope.get_auto_calibration()))
+
+    print("Channel C1 Parameters        : ", scope.get_parameter(scope.C1, "ALL"))
     scope.close()
 
 

@@ -4,11 +4,7 @@ from pylecroy.pylecroy import Lecroy
 import logging
 import sys
 
-SCOPE_LASER = "10.67.16.21"
-SCOPE_SCA = "10.67.16.22"
-ADDRESS = SCOPE_LASER
-
-VERSION = '1.0'
+VERSION = '0.1.0'
 
 USAGE = '''example_a: execute the lecroy class example a
 Usage:
@@ -70,14 +66,14 @@ def main(argv=None):
 
     print("Channels  OFF...")
     for channel in scope.WAVEFORM_CHANNELS:
-        scope.show_trace(channel, "OFF")
+        scope.display_channel(channel, "OFF")
 
     for channel in scope.INTERNAL_MEMORY:
-        scope.show_trace(channel, "OFF")
+        scope.display_channel(channel, "OFF")
 
     print("ShowChannels C1 and Z1 ...")
-    scope.show_trace(scope.C1, "ON")
-    scope.show_trace(scope.Z1, "ON")
+    scope.display_channel(scope.C1, "ON")
+    scope.display_channel(scope.Z1, "ON")
 
     input("Set calibration signal to C1 and Press a key to continue...")
     input("Select Zoom area on Z1 and Press a key to continue...")

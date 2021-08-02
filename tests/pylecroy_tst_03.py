@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pylecroy.scope.pylecroy import PyLecroy
+from pylecroy.pylecroy import Lecroy
 import logging
 import sys
 
@@ -54,7 +54,7 @@ def main(argv=None):
     if log is True:
         logging.basicConfig(level=logging.INFO)
 
-    scope = PyLecroy(address)
+    scope = Lecroy(address)
 
     # Get identify
     scope.identify()
@@ -73,7 +73,7 @@ def main(argv=None):
     print("Hardcopy directory : " + scope.get_hardcopy(9))
 
     input("Display signal on channel C1 and press a key to continue...")
-    scope.show_trace(scope.C1, "ON")
+    scope.display_channel(scope.C1, "ON")
     # Perform a print screen
     scope.print_screen()
     input("Check print screen file in scope and press a key to continue...")

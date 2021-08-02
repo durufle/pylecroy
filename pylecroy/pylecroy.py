@@ -82,7 +82,7 @@ class Lecroy:
         """
         self._instance = win32com.client.Dispatch("LeCroy.ActiveDSOCtrl.1")
         """ Create Connection with device """
-        if self._instance.MakeConnection("IP:" + self._address):
+        if self._instance.MakeConnection(self._address):
             self._logger.info("Connexion established...")
             self._is0pen = True
             self.set_timeout(self._timeout)
@@ -262,6 +262,8 @@ class Lecroy:
             raise ValueError("Not a valid channel...")
         if mode == self.BYTE:
             wave = self._instance.GetByteWaveform(name, max_bytes, 0)
+        elif mode == self.INTEGER:
+            wave = self._instance.GetIntegerWaveform(name, max_bytes, 0)
         else:
             raise ValueError("Not a supported get waveform mode...")
         return wave[first_byte:]
@@ -404,18 +406,18 @@ class Lecroy:
         cmd = "MSG {0}".format(msg)
         self._instance.WriteString(cmd, True)
 
-    def show_trace(self, trace, state):
+    def display_channel(self, channel, state):
         """
         Display/ Doesn't display a channel to the scope screen.
 
-        :param trace: trace channel number
+        :param channel: trace channel number
         :param state: ON / OFF
         """
-        if (trace not in self.WAVEFORM_CHANNELS) and (trace not in self.INTERNAL_MEMORY):
+        if (channel not in self.WAVEFORM_CHANNELS) and (channel not in self.INTERNAL_MEMORY):
             raise ValueError("Trace selected not supported...")
         if state not in self.TRACE_STATE:
             raise ValueError("state selected not supported...")
-        cmd = "{0}:TRA {1}".format(trace, state)
+        cmd = "{0}:TRA {1}".format(channel, state)
         self._instance.WriteString(cmd, True)
 
     def save_memory(self, trace, memory):
