@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 from pylecroy.pylecroy import Lecroy
+from pylecroy.pylecroy import Channels
+
 import sys
 
 VERSION = '0.1.0'
@@ -9,7 +11,7 @@ USAGE = '''
 Return information from Lecroy
 
 Usage:
-    python lecroy_info.py -a 10.67.16.22
+    python lecroy_info.py -a "IP:10.67.16.22"
 
 Options:
     -h, --help              this help message.
@@ -52,13 +54,11 @@ def main(argv=None):
     scope = Lecroy(address)
 
     # Get scope identifier identify
-    scope.identify()
     print("scope identifier             : {} ".format(scope.identifier))
-    scope.get_trigger_mode()
     print("get trigger mode             : {} ".format(scope.trigger_mode))
-    print("get auto calibration         : {} ".format(scope.get_auto_calibration()))
+    print("get auto calibration         : {} ".format(scope.auto_calibration))
 
-    print("Channel C1 Parameters        : ", scope.get_parameter(scope.C1, "ALL"))
+    print("Channel C1 Parameters        : ", scope.get_parameter(Channels.C1, "ALL"))
     scope.close()
 
 

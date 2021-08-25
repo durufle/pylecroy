@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import Lecroy
+from pylecroy.pylecroy import *
 import logging
 import sys
 
@@ -13,7 +13,6 @@ Usage:
 Options:
     -h, --help              this help message.
     -v, --version           version info.
-    -l, --logging           enable logging
     -a, --address           device IP address
 '''
 
@@ -24,9 +23,8 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(argv, 'hvla:', ['help', 'version', 'logging', 'address='])
+        opts, args = getopt.gnu_getopt(argv, 'hva:', ['help', 'version', 'address='])
         address = None
-        log = False
 
         for o, a in opts:
             if o in ('-h', '--help'):
@@ -35,8 +33,6 @@ def main(argv=None):
             if o in ('-v', '--version'):
                 print(VERSION)
                 return 0
-            elif o in ('-l', '--logging'):
-                log = True
             elif o in ('-a', '--address'):
                 address = a
 
@@ -48,34 +44,30 @@ def main(argv=None):
 
     # Load default value
     if address is None:
-        sys.stderr.write("scope address is mandatory..."+ "\n")
+        sys.stderr.write("scope address is mandatory..." + "\n")
         sys.stderr.write(USAGE + "\n")
-
-    if log is True:
-        logging.basicConfig(level=logging.INFO)
 
     scope = Lecroy(address)
 
-    # Get identify
-    scope.identify()
-    print("scope identifier   : " + scope.identifier)
+    # Get scope identifier property
+    print("scope identifier : {} ".format(scope.identifier))
 
     # Get current hardcopy setup
-    print(scope.get_hardcopy_full_setup())
+    print(scope.get_hardcopy_all())
     # get current hardcopy directory
-    print("Hardcopy directory : " + scope.get_hardcopy(9))
+    print("Hardcopy directory : " + scope.get_hardcopy_index(9))
 
     # Test trigger mode
-    scope.set_trigger_mode(scope.AUTO)
+    scope.trigger_mode = TriggerModes.AUTO
 
     # Set new hardcopy environment (dir, file)
-    scope.set_hardcopy(scope.BMP, "D:\\TEST_PYLECROY", "TEST")
-    print("Hardcopy directory : " + scope.get_hardcopy(9))
+    scope.set_hardcopy(Hardcopy.BMP, "D:\\TEST_PYLECROY", "TEST")
+    print("Hardcopy directory : " + scope.get_hardcopy_index(0))
 
     input("Display signal on channel C1 and press a key to continue...")
-    scope.display_channel(scope.C1, "ON")
+    scope.display_channel(Channels.C1, "ON")
     # Perform a print screen
-    scope.print_screen()
+    scope.screen_dump()
     input("Check print screen file in scope and press a key to continue...")
 
     scope.close()

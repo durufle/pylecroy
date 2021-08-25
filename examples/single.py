@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import Lecroy
-import logging
+from pylecroy.pylecroy import *
+import numpy as np
+import matplotlib.pyplot as plt
+
 import sys
 
 VERSION = '0.1.0'
 
-USAGE = '''example_a: execute the lecroy class example a
+USAGE = '''single: no sequence acquisition mode example
 Usage:
-    python example_a.py -a 10.67.16.22
+    python single.py -a "IP:10.67.16.22"
 
 Options:
     -h, --help              this help message.
     -v, --version           version info.
-    -l, --logging           enable logging
     -a, --address           device IP address
 '''
 
@@ -24,9 +25,8 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(argv, 'hvla:', ['help', 'version', 'logging', 'address='])
+        opts, args = getopt.gnu_getopt(argv, 'hva:', ['help', 'version', 'address='])
         address = None
-        log = False
 
         for o, a in opts:
             if o in ('-h', '--help'):
@@ -35,8 +35,6 @@ def main(argv=None):
             if o in ('-v', '--version'):
                 print(VERSION)
                 return 0
-            elif o in ('-l', '--logging'):
-                log = True
             elif o in ('-a', '--address'):
                 address = a
 
@@ -52,34 +50,42 @@ def main(argv=None):
         print(USAGE)
         return 2
 
-    if log is True:
-        logging.basicConfig(level=logging.INFO)
+    array = [[]]
 
     scope = Lecroy(address)
 
-    # Get scope identifier identify
-    scope.identify()
+    # Get scope identifier property
     print("scope identifier : {} ".format(scope.identifier))
+    input("Set calibration signal to C1 and Press a key to continue...")
 
-    print("Set trigger AUTO...")
-    scope.set_trigger_mode(scope.AUTO)
+    print("Disable sequence Mode...")
+    scope.set_sequence(Sequence.OFF, 10, 500000)
+
+    print("Set trigger STOP...")
+    scope.trigger_mode = TriggerModes.STOP
 
     print("Channels  OFF...")
-    for channel in scope.WAVEFORM_CHANNELS:
+    for channel in Channels.NAMES:
         scope.display_channel(channel, "OFF")
 
-    for channel in scope.INTERNAL_MEMORY:
+    for channel in Memories.NAMES:
         scope.display_channel(channel, "OFF")
 
-    print("ShowChannels C1 and Z1 ...")
-    scope.display_channel(scope.C1, "ON")
-    scope.display_channel(scope.Z1, "ON")
+    print("ShowChannels C1...")
+    scope.display_channel(Channels.C1, "ON")
 
-    input("Set calibration signal to C1 and Press a key to continue...")
-    input("Select Zoom area on Z1 and Press a key to continue...")
+    print("Defined Waveform transfer mode...")
+    scope.set_waveform_transfer(first_point=0, segment=0)
+    print("Set trigger SINGLE...")
+    scope.trigger_mode = TriggerModes.SINGLE
+    print("Wait for acquisition...")
+    scope.wait()
 
-    scope.get_wave_to_file("./zoom_area.bin", scope.BYTE, scope.Z1, 500000)
-    scope.display_wave("./zoom_area.bin")
+    trace = scope.get_wave(WaveForms.INTEGER, Channels.C1, 500000)
+    array.insert(0, np.array(trace, dtype=np.int32))
+    plt.plot(array[0])
+    plt.title('Acquit {0}'.format(0))
+    plt.show()
     input("press a key to exit...")
 
     scope.close()

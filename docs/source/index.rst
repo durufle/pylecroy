@@ -13,7 +13,6 @@ Welcome to PyLecroy's documentation!
    ./overview.rst
    ./api.rst
    ./sample.rst
-   ./tests.rst
    ./utils.rst
 
 Indices and tables

@@ -15,7 +15,7 @@ This utility return some lecroy's parameter. It's useful to check if everything 
     Return information from Lecroy
 
     Usage:
-        python lecroy_info.py -a 10.67.16.22
+        python lecroy_info.py -a "IP:10.67.16.22"
 
     Options:
         -h, --help              this help message.
