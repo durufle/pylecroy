@@ -51,10 +51,7 @@ class GridStates(Const):
     TANDEM = 'TANDEM'
     QUATTRO = 'QUATTRO'
     TWELVE = 'TWELVE'
-    SIXTEEN = 'SIXTEN'
-    TRIPLE = 'TRIPLE'
-    HEX = 'HEX'
-    STATES = (AUTO, SINGLE, DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE, SIXTEEN, TRIPLE, HEX)
+    STATES = (AUTO, SINGLE, DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE)
 
 
 class Channels(Const):
@@ -151,17 +148,19 @@ class Sequence(Const):
 
 
 class Lecroy:
-
     """
     Class to drive a Lecroy oscilloscope using ActiveDSO active X
     """
-
     def __init__(self, address=None):
-        self._is0pen = False
+        self._is_open = False
         self._instance = None
         self._mode = None
         self._timeout = None
         self.open(address)
+
+    def __del__(self):
+        if self._is_open:
+            self.close()
 
     # ----------------------------------------------------------------------- #
     def open(self, address):
@@ -175,7 +174,7 @@ class Lecroy:
         """ Create Connection with device """
 
         if self._instance.MakeConnection(address):
-            self._is0pen = True
+            self._is_open = True
             self.timeout = 1
             self.mode = RemoteModes.REMOTE
             self.beep()
@@ -190,13 +189,13 @@ class Lecroy:
         """
         self.mode = RemoteModes.LOCAL
         if self._instance.Disconnect():
-            self._is0pen = False
+            self._is_open = False
 
     # ----------------------------------------------------------------------- #
     @property
     def mode(self):
         """
-        Get the current scope mode. This method return the private variable.
+        Get the current scope mode.
 
         :return: device mode.
         """
@@ -213,7 +212,7 @@ class Lecroy:
         if mode not in RemoteModes.MODES:
             raise ValueError("Not a valid mode...")
 
-        if self._is0pen:
+        if self._is_open:
             if self._instance.SetRemoteLocal(mode):
                 self._mode = mode
 
@@ -230,55 +229,56 @@ class Lecroy:
             ReadString, ReadBinary, WaitForOPC, GetByteWaveform, GetIntegerWaveform GetNativeWaveform,
             GetScaledWaveform, GetScaledWaveformWithTimes
 
-        :param value:
-        :return:
+        :param value: Single, Time-out time in seconds
         """
         if self._instance.SetTimeout(value):
             self._timeout = value
 
     # ----------------------------------------------------------------------- #
-    def get_hardcopy_all(self):
-        """
-        Get all hard-copy setup
+    # HARDCOPY - Printing the Display/Screen Capture
+    # ----------------------------------------------------------------------- #
 
-        :return: return the complete of hardware setup as a list.
+    def get_hardcopy(self) -> dict:
+        """
+        Get all hardcopy setup
+
+        :return: return the complete of hardware setup as a dict.
         """
         if self._instance.WriteString("HCSU?", True):
-            return self._instance.ReadString(5000)
+            result = self._instance.ReadString(5000).split(',')
+            return dict(zip(result[::2], result[1::2]))
 
-    def get_hardcopy_index(self, index):
+    def set_hardcopy(self, config: dict):
         """
-        Get and hardcopy index
+        Set hardcopy parameter from dictionnary
 
-        :return: hardcopy directory from hardware setup
+        :param config: A dictionnary containing one or several harcopy paramterer
         """
-        if self._instance.WriteString("HCSU?", True):
-            value = self._instance.ReadString(5000)
-            return self._instance.GetCommaDelimitedString(value, index)
+        # convert dictionnary into list
+        new_list = zip(config.keys(), config.values())
+        new_list = list(new_list)
 
-    def set_hardcopy(self, device, directory, name):
-        """
-        Partial hard-copy setup.
+        fields = []
+        for i in new_list:
+            item, value = i
+            fields.append("{0},{1},".format(item, value))
 
-        :param device: print screen file format (BMP, JPEG, PNG, TIFF)
-        :param directory: print screen directory
-        :param name: file name
-        """
-        if device not in Hardcopy.DEVICES:
-            raise ValueError("Not a valid device value...")
-        # Create MAUI command
-        cmd = "HCSU DEV,{0},DIR,\"{1}\",FILE,\"{2}\" ".format(device, directory, name)
+        params = ''.join(fields)
+        cmd = 'HCSU ' + params[:-1]
         self._instance.WriteString(cmd, True)
+        while not self._instance.WaitForOPC():
+            pass
 
     # ----------------------------------------------------------------------- #
-    def store_hardcopy(self, name):
+    def store_hardcopy(self, name, form='BMP'):
         """
         Store an hardcopy file from scope to PC.
 
         :param name: file name
+        :param form: Hardcopy format
         :return: None
         """
-        self._instance.StoreHardcopyToFile("BMP", "BCKG, WHITE", name)
+        self._instance.StoreHardcopyToFile(form, "", name)
 
     # ----------------------------------------------------------------------- #
 
@@ -291,6 +291,9 @@ class Lecroy:
         self._instance.WriteString("SCDP", True)
 
     # ----------------------------------------------------------------------- #
+    # ACQUISITION - Controlling Waveform Captures
+    # ----------------------------------------------------------------------- #
+
     def set_waveform_transfer(self, first_point=0, segment=0):
         """
         configures parameters controlling the waveform transfer
@@ -361,10 +364,6 @@ class Lecroy:
 
     # ----------------------------------------------------------------------- #
 
-    # ----------------------------------------------------------------------- #
-    # ACQUISITION - Controlling Waveform Captures
-    # ----------------------------------------------------------------------- #
-
     @property
     def trigger_mode(self):
         """
@@ -385,6 +384,8 @@ class Lecroy:
         if mode not in TriggerModes.MODES:
             raise ValueError("Not a Valid mode...")
         self._instance.WriteString("TRMD " + mode, True)
+        while not self._instance.WaitForOPC():
+            pass
 
     def trigger_arm(self):
         """
@@ -430,6 +431,8 @@ class Lecroy:
         return self._instance.WriteString("SEQUENCE {0},{1},{2}".format(mode, segment, size), True)
 
     # ----------------------------------------------------------------------- #
+    # CURSOR - Performing Measurements
+    # ----------------------------------------------------------------------- #
 
     def get_parameter(self, name, parameter):
         """
@@ -448,6 +451,9 @@ class Lecroy:
             return self._instance.ReadString(1000)
 
     # ----------------------------------------------------------------------- #
+    # SAVE/RECALL SETUP - Perserving and Restoring Panel Settings
+    # ----------------------------------------------------------------------- #
+
     @property
     def panel(self):
         """
@@ -456,13 +462,69 @@ class Lecroy:
         """
         return self._instance.GetPanel()
 
+    # ----------------------------------------------------------------------- #
     @panel.setter
-    def panel(self, panel):
+    def panel(self, panel: str):
         """
-        The Panel setter sets the instrument's control state using a panel string captured using the panel property.
+        The Panel setter sets the instrument's control state using a panel
+        string captured using the panel property.
+
+        :param panel: panel string used
 
         """
         self._instance.SetPanel(panel)
+
+    # ----------------------------------------------------------------------- #
+    # WAVEFORM TRANSFER - Preserving and Restoring Waveforms
+    # ----------------------------------------------------------------------- #
+    def save_memory(self, channel, memory):
+        """
+        Save a trace in an internal memory slot
+
+        :param channel: trace channel number
+        :param memory: memory slot n umber
+        :return: Write command status
+
+        :exception: ValueError: Trace selected not supported...
+        :exception: ValueError: Memory selected not supported...
+        """
+        if channel not in Channels.NAMES:
+            raise ValueError("Trace selected not supported...")
+        if memory not in Memories.NAMES:
+            raise ValueError("Memory selected not supported...")
+        cmd = "STO {0},{1}".format(channel, memory)
+        return self._instance.WriteString(cmd, True)
+
+    # ----------------------------------------------------------------------- #
+    # SAVE/RECALL SETUP - Perserving and Restoring Panel Settings
+    # ----------------------------------------------------------------------- #
+    def recall_setup(self, setup):
+        """
+        Recall a setup stored in an internal setup slot
+
+        :param: setup slot number
+        :return: Write command status
+
+        :exception: ValueError: Setup slot selected not supported..
+        """
+        if setup not in Setups.SLOTS:
+            raise ValueError("Setup slot selected not supported...")
+        cmd = "*RCL {0}".format(setup)
+        return self._instance.WriteString(cmd, True)
+
+    def save_setup(self, setup):
+        """
+        Save a setup stored in an internal setup slot
+
+        :param: setup slot number
+        :return: Write command status
+
+        :exception: ValueError: Setup slot selected not supported..
+        """
+        if setup not in Setups.SLOTS:
+            raise ValueError("Setup slot selected not supported...")
+        cmd = "*SAV {0}".format(setup)
+        return self._instance.WriteString(cmd, True)
 
     # ----------------------------------------------------------------------- #
     # Display Commands and Queries
@@ -514,16 +576,8 @@ class Lecroy:
             raise ValueError("Grid mode not supported...")
         cmd = "GRID {0}".format(grid)
         self._instance.WriteString(cmd, True)
-
-    def show_message(self, msg):
-        """
-        Show a custom message to the screen
-
-        :param msg: message
-        :return: Write command status
-        """
-        cmd = "MSG {0}".format(msg)
-        return self._instance.WriteString(cmd, True)
+        while not self._instance.WaitForOPC():
+            pass
 
     def display_channel(self, name, state):
         """
@@ -538,41 +592,14 @@ class Lecroy:
         if state not in Display.STATES:
             raise ValueError("state selected not supported...")
         cmd = "{0}:TRA {1}".format(name, state)
-        return self._instance.WriteString(cmd, True)
-
-    def save_memory(self, channel, memory):
-        """
-        Save a trace in an internal memory slot
-
-        :param channel: trace channel number
-        :param memory: memory slot n umber
-        :return: Write command status
-        """
-        if channel not in Channels.NAMES:
-            raise ValueError("Trace selected not supported...")
-        if memory not in Memories.NAMES:
-            raise ValueError("Memory selected not supported...")
-        cmd = "STO {0},{1}".format(channel, memory)
-        return self._instance.WriteString(cmd, True)
-
-    def recall_setup(self, setup):
-        """
-        Recall a setup stored in an internal setup slot
-
-        :param: setup slot number
-        :return: Write command status
-        :exception: ValueError: Setup slot selected not supported..
-        """
-        if setup not in Setups.SLOTS:
-            raise ValueError("Setup slot selected not supported...")
-        cmd = "*RCL {0}".format(setup)
-        return self._instance.WriteString(cmd, True)
+        self._instance.WriteString(cmd, True)
+        while not self._instance.WaitForOPC():
+            pass
 
     # ----------------------------------------------------------------------- #
     def clear(self, reboot):
         """
         Clear device with reboot option
-
         """
         if isinstance(reboot, bool):
             self._instance.DeviceClear(reboot)
@@ -597,6 +624,7 @@ class Lecroy:
     def auto_calibration(self):
         """
         Get the auto calibration flag
+
         :return: ON or OFF
         """
         cmd = "ACAL?"

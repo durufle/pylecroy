@@ -82,10 +82,11 @@ def main(argv=None):
     scope.wait()
 
     trace = scope.get_wave(WaveForms.INTEGER, Channels.C1, 500000)
-    array.insert(0, np.array(trace, dtype=np.int32))
-    plt.plot(array[0])
-    plt.title('Acquit {0}'.format(0))
-    plt.show()
+    if trace:
+        array.insert(0, np.array(trace, dtype=np.int32))
+        plt.plot(array[0])
+        plt.title('Acquit {0}'.format(0))
+        plt.show()
     input("press a key to exit...")
 
     scope.close()

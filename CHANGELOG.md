@@ -7,10 +7,15 @@
 - Remove calibrate property. The **calibrate** method return the status.
 - Remove **get_wave_to_file** and **display_wave** methods  
 - Remove logging package dependency
-- Remove version constant in Lecroy class 
+- Remove version constant in Lecroy class
+- Remove **show_message** method.
+- **get_hardcopy** method return parameters in dictionnary format
 - Defined constant classes
 - Defined getter: identifier, display, grid, auto_cal, mode
 - Defined setter: display, grid, auto_cal, mode
+- Move examples to documentation
+- Rename lecroy_info utility to lcry_info.
+
 
 **v0.1.2**
 - Correction on a wrong WaitOPC method usage
