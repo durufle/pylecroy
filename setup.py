@@ -35,7 +35,7 @@ setup(name=name,
       ],
 
       entry_points={
-          'console_scripts': ['lecroy_info = bin.lecroy_info:main'],
+          'console_scripts': ['lcry_info = bin.lcry_info:main'],
       },
 
       keywords='lecroy',
