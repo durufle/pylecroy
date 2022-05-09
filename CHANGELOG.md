@@ -1,5 +1,7 @@
 **unreleased**
 
+**v1.0.0**
+
 - Replace **show_trace** method by **display_channel**
 - Replace **print-screen** method by **screen_dump**
 - Allow connection with TCP/IP, LXI and USBTMC interfaces.
