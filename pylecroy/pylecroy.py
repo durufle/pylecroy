@@ -302,11 +302,8 @@ class Lecroy:
         :param  segment: Integer, Segment number to transfer (0 = all segments).
 
         :notes:
-        This method affects how the various GetWaveform functions transfer a waveform. For the majority of cases the
-        default settings will be sufficient. These are:
-            Start Transfer at first point
-            Transfer all data points
-            Transfer all segments.
+            This method affects how the various GetWaveform functions transfer a waveform. For the majority of cases the
+            default settings will be sufficient. These are Start Transfer at first point, Transfer all data points Transfer all segments.
         """
         self._instance.SetupWaveformTransfer(first_point, 0, segment)
 
@@ -339,9 +336,7 @@ class Lecroy:
         :param max_bytes: maximum byte
         :return: list of waveform values
 
-        :notes:
-        - For NATIVE WaveForm, 12-bit oscilloscopes must use the 16-bit word format. Set maxBytes value as
-        <number of bytes to read> x 2.
+        :notes: For NATIVE WaveForm, 12-bit oscilloscopes must use the 16-bit word format. Set maxBytes value as <number of bytes to read> x 2.
 
         """
         wave = None

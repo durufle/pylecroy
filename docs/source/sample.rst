@@ -1,8 +1,9 @@
 Examples
-========
+********
 
 Connection
-----------
+==========
+
 Basic example, showing how to connect and get some device parameter values.
 
 Connection to the device can be made using different type of interface:
@@ -30,7 +31,7 @@ Note that for TCP/IP and LXI interfaces, the oscilloscope Host name can be used 
         device.close()
 
 Controlling Display
--------------------
+===================
 This command domain allow to control the Display
 
 .. code-block:: python
@@ -65,7 +66,7 @@ This command domain allow to control the Display
 
 
 Printing the Display/Screen Capture
------------------------------------
+===================================
 
 .. code-block:: python
 
@@ -96,7 +97,7 @@ Printing the Display/Screen Capture
         device.close()
 
 Preserving and Restoring Waveforms
-----------------------------------
+==================================
 
 .. code-block:: python
 

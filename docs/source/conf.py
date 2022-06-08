@@ -12,7 +12,7 @@
 #
 import os
 import sys
-import sphinx_rtd_theme
+
 sys.path.insert(0, os.path.abspath('../../pylecroy'))
 
 
@@ -39,7 +39,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
-    'sphinx_rtd_theme'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -56,16 +55,9 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 # html_theme = 'classic'
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'alabaster'
 
 html_theme_options = {
-    "display_version": True,
-    # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': True,
-    'titles_only': False
 }
 
 # UL Logo
@@ -75,3 +67,28 @@ html_logo = './_images/Ul_Red.png'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
+
+today_fmt = "Generated on %b %d, %Y"
+
+latex_engine = 'xelatex'
+latex_logo = './_images/Ul_Red.png'
+
+latex_elements = {
+    'fontenc': '\\usepackage{fontspec}',
+    'fontpkg': '''\
+                \\setmainfont{DejaVu Serif}
+                \\setsansfont{DejaVu Sans}
+                \\setmonofont{DejaVu Sans Mono}''',
+    'geometry': '\\usepackage[vmargin=2cm, hmargin=2cm]{geometry}',
+    'preamble': '''\
+                \\usepackage[titles]{tocloft}
+                \\cftsetpnumwidth {1.25cm}\\cftsetrmarg{1.5cm}
+                \\setlength{\\cftchapnumwidth}{0.75cm}
+                \\setlength{\\cftsecindent}{\\cftchapnumwidth}
+                \\setlength{\\cftsecnumwidth}{1.25cm}''',
+    'fncychap': '\\usepackage[Sonny]{fncychap}',
+    'printindex': '\\footnotesize\\raggedright\\printindex',
+    'classoptions': ',oneside',
+}
+
+latex_show_urls = 'footnote'
