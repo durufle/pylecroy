@@ -1,10 +1,11 @@
 Utils
-=====
+*****
 
 Utils script are installed during package installation process
 
 lcry_info
----------
+=========
+
 This utility return some lecroy's parameter. It's useful to check if everything is setup properly
 after package installation.
 
