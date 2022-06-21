@@ -4,7 +4,7 @@ from os import path
 from sphinx.setup_command import BuildDoc
 
 name = 'pylecroy'
-version = '0.1.2'
+version = '1.0.0'
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
@@ -35,7 +35,7 @@ setup(name=name,
       ],
 
       entry_points={
-          'console_scripts': ['lecroy_info = bin.lecroy_info:main'],
+          'console_scripts': ['lcry_info = bin.lcry_info:main'],
       },
 
       keywords='lecroy',

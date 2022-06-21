@@ -1,21 +1,25 @@
 Utils
-=====
+*****
 
 Utils script are installed during package installation process
 
-lecroy_info
------------
-This utility return some lecroy's parameter. It's useful to check if everything is setup properly.
+lcry_info
+=========
+
+This utility return some lecroy's parameter. It's useful to check if everything is setup properly
+after package installation.
 
 .. code-block::
 
-    (venv) lecroy_info
-    scope IP address must be provide...
+    (venv) lcry_info
+    scope address must be provide...
 
     Return information from Lecroy
 
     Usage:
-        python lecroy_info.py -a 10.67.16.22
+        python lecroy_info.py -a "IP:10.67.16.22"
+        python lcry_info.py -a "IP:10.67.16.22"
+        python lcry_info.py -a "USBTMC:<Host Name>"
 
     Options:
         -h, --help              this help message.

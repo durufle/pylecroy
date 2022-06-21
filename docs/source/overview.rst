@@ -1,5 +1,6 @@
 Overview
-========
+********
+
 This package encapsulates the access to a Lecroy oscilloscope. It provide basic function in order to communicate
 with the device.
 
@@ -11,34 +12,31 @@ You will need `Python 3+ <https://www.python.org>`_
 
 This package use the ActiveDSO active X control from lecroy, you need to install it in your PC workstation.
 
-In order to interface python with COM object, you need to install win32com package.
-
-* `pywin32 <https://pypi.org/project/pywin32/>`_
-
-The following packages are also needed:
-
-* `numpy <https://numpy.org/>`_
-* `matplotlib <https://matplotlib.org/>`_
-
-To install these packages use the following command:
+This package is available under devpi server. So you can install it using pip tools as follow:
 
 .. code-block:: bash
 
-    $ pip install <package>
+    pip install pylecroy
 
-Is you are using PyCharm IDE, this package can be install using **File -> Settings...**
-This will open a window where you can add packages:
 
-* Go to *Project: <your_project_name>*
-* Go to *Project Interpreter*
+.. note::
 
-A list of installed packages are showed, you can add, delete and update packages.
+    Refer to initialize pip application note in order to point on internal devpi server.
 
-.. image:: ./_images/pycharm_packages.png
+You can install it from the wheel distribution package:
+
+.. code-block:: bash
+
+    pip install pylecroy-x.y.z-py3-none-any.whl
+
+.. note::
+
+    Replace x.y.z by the package version number.
+
 
 
 Package development
-=====================
+===================
 
 The code of the package is developed under :file:`pylecroy` directory.
 
@@ -70,10 +68,22 @@ Note that package will be used by other people, so stability matters.
     If the implementation is easy to explain, it may be a good idea.
     Namespaces are one honking great idea -- let's do more of those!
 
-In order to update the documentation, you need :program:`sphinx` and sphinx_rts_theme.
+All necessary packages need to develop are identifed in the requirements.txt file.
 
-To generate python package in wheel format and generate sphinx documentation:
+After cloning, create a virtual environement, activate it and install necessary package:
+
+.. code-block:: bash
+
+    $ git clone ssh://git@git.ul-ts.com:5022/ims-se/hardware-team/pybench/pylecroy.git
+    $ cd pylecroy
+    $ python -m python3 -m venv venv
+    $ .\venv\Script\activate.bat
+    (venv) $ pip install -r requirements.txt
+
+To generate python package in wheel format and generate sphinx documentation locally:
 
 .. code-block:: bash
 
     $ python setup.py bdist_wheel build_sphinx
+
+

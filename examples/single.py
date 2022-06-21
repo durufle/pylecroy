@@ -1,12 +1,16 @@
+#!/usr/bin/env python3
+
 from pylecroy.pylecroy import *
+import numpy as np
+import matplotlib.pyplot as plt
+
 import sys
-import time
 
-VERSION = '1.0'
+VERSION = '0.1.0'
 
-USAGE = '''pylecroy_tst_02: execute the lecroy test 02
+USAGE = '''single: no sequence acquisition mode example
 Usage:
-    python pylecroy_tst_02.py [options]
+    python single.py -a "IP:10.67.16.22"
 
 Options:
     -h, --help              this help message.
@@ -42,49 +46,52 @@ def main(argv=None):
 
     # Load default value
     if address is None:
-        sys.stderr.write("scope address is mandatory..."+ "\n")
-        sys.stderr.write(USAGE + "\n")
+        print("scope IP address must be provide...")
+        print(USAGE)
+        return 2
+
+    array = [[]]
 
     scope = Lecroy(address)
 
     # Get scope identifier property
     print("scope identifier : {} ".format(scope.identifier))
-    # Stop Trigger
+    input("Set calibration signal to C1 and Press a key to continue...")
+
+    print("Disable sequence Mode...")
+    scope.set_sequence(Sequence.OFF, 10, 500000)
+
+    print("Set trigger STOP...")
     scope.trigger_mode = TriggerModes.STOP
 
-    input("Get a signal on C1 and press a key to continue...")
-
-    # grid state
-    for state in GridStates.STATES:
-        print("Grid state : " + state)
-        scope.grid = state
-        time.sleep(1)
-
-    # Dual grid
-    scope.grid = GridStates.DUAL
-
-    # Set  C1 to C4 to off
     print("Channels  OFF...")
     for channel in Channels.NAMES:
         scope.display_channel(channel, "OFF")
-    print("Memory  OFF...")
-    for Memory in Memories.NAMES:
-        scope.display_channel(Memory, "OFF")
 
-    print("Channel C1 ON...")
+    for channel in Memories.NAMES:
+        scope.display_channel(channel, "OFF")
+
+    print("ShowChannels C1...")
     scope.display_channel(Channels.C1, "ON")
 
-    print("Set Trigger Single...")
+    print("Defined Waveform transfer mode...")
+    scope.set_waveform_transfer(first_point=0, segment=0)
+    print("Set trigger SINGLE...")
     scope.trigger_mode = TriggerModes.SINGLE
+    print("Wait for acquisition...")
+    scope.wait()
 
-    # save C1 to M1
-    print("Channel C1 save in M1...")
-    scope.save_memory(Channels.C1, Memories.M1)
-    print("Show M1...")
-    scope.display_channel(Memories.M1, "ON")
+    trace = scope.get_wave(WaveForms.INTEGER, Channels.C1, 500000)
+    if trace:
+        array.insert(0, np.array(trace, dtype=np.int32))
+        plt.plot(array[0])
+        plt.title('Acquit {0}'.format(0))
+        plt.show()
+    input("press a key to exit...")
 
     scope.close()
 
 
 if __name__ == '__main__':
     sys.exit(main())
+

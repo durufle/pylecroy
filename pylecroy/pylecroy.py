@@ -1,97 +1,185 @@
 #!/usr/bin/python3
-#
-# Lecroy scope class
-#
+
 import sys
 import win32com.client
-import logging
-import logging.config
-import numpy as np
-import matplotlib.pyplot as plt
+
+
+class CustomException(Exception):
+    """Exception raised when very uncommon things happen"""
+    pass
+
+
+class MetaConst(type):
+    def __getattr__(cls, key):
+        return cls[key]
+
+    def __setattr__(cls, key, value):
+        raise TypeError
+
+
+class Const(object, metaclass=MetaConst):
+    def __getattr__(self, name):
+        return self[name]
+
+    def __setattr__(self, name, value):
+        raise TypeError
+
+
+class RemoteModes(Const):
+    LOCAL = 0
+    REMOTE = 1
+    MODES = (LOCAL, REMOTE)
+
+
+class TriggerModes(Const):
+    AUTO = 'AUTO'
+    NORMAL = 'NORM'
+    SINGLE = "SINGLE"
+    STOP = "STOP"
+    MODES = (AUTO, NORMAL, SINGLE, STOP)
+
+
+class GridStates(Const):
+    AUTO = 'AUTO'
+    SINGLE = 'SINGLE'
+    DUAL = 'DUAL'
+    QUAD = 'QUAD'
+    OCTAL = 'OCTAL'
+    XY = 'XY'
+    XYSINGLE = 'XYSINGLE'
+    XYDUAL = 'XYDUAL'
+    TANDEM = 'TANDEM'
+    QUATTRO = 'QUATTRO'
+    TWELVE = 'TWELVE'
+    STATES = (AUTO, SINGLE, DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE)
+
+
+class Channels(Const):
+    C1 = 'C1'
+    C2 = 'C2'
+    C3 = 'C3'
+    C4 = 'C4'
+    Z1 = "Z1"
+    Z2 = "Z2"
+    Z3 = "Z3"
+    Z4 = "Z4"
+    Z5 = "Z5"
+    Z6 = "Z6"
+    Z7 = "Z7"
+    Z8 = "Z8"
+    F1 = "F1"
+    F2 = "F2"
+    F3 = "F3"
+    F4 = "F4"
+    F5 = "F5"
+    F6 = "F6"
+    F7 = "F7"
+    F8 = "F8"
+    NAMES = (C1, C2, C3, C4, Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, F1, F2, F3, F4, F5, F6, F7, F8)
+
+
+class Parameters(Const):
+    # Parameters related constants
+    ALL = 'ALL'
+    AMPL = 'AMPL'
+    DELAY = 'DLY'
+
+    RISE = 'RISE'
+    FALL = 'FALL'
+    MEAN = 'MEAN'
+    PKPK = 'PKPK'
+    NAMES = (ALL, AMPL, DELAY, RISE, FALL, MEAN, PKPK)
+
+
+class Memories(Const):
+    M1 = 'M1'
+    M2 = 'M2'
+    M3 = 'M3'
+    M4 = 'M4'
+    NAMES = (M1, M2, M3, M4)
+
+
+class Display(Const):
+    ON = "ON"
+    OFF = "OFF"
+    STATES = (ON, OFF)
+
+
+class Setups(Const):
+    S1 = 0
+    S2 = 1
+    S3 = 2
+    S4 = 3
+    S5 = 4
+    S6 = 5
+    SLOTS = (S1, S2, S3, S4, S5, S6)
+
+
+class WaveForms(Const):
+    BYTE = 0
+    INTEGER = 1
+    SCALED = 2
+    NATIVE = 3
+    MODES = (BYTE, INTEGER, SCALED, NATIVE)
+
+
+class Hardcopy(Const):
+    # Devices constant
+    BMP = 'BMP'
+    JPEG = 'JPEG'
+    PNG = 'PNG'
+    TIFF = 'TIFF'
+    DEVICE = (BMP, JPEG, PNG, TIFF)
+    # Index
+    IDX_FOLDER = 9
+    IDX_FILE = 11
+
+
+class Calibration(Const):
+    ON = 'ON'
+    OFF = 'OFF'
+    STATES = (ON, OFF)
+
+
+class Sequence(Const):
+    ON = 'ON'
+    OFF = 'OFF'
+    MODES = (ON, OFF)
 
 
 class Lecroy:
     """
     Class to drive a Lecroy oscilloscope using ActiveDSO active X
-
     """
-    version = "0.1.2"
-    __version__ = version
-
-    # scope mode
-    LOCAL, REMOTE = (0, 1)
-    # trigger , grid mode
-    AUTO, NORM, SINGLE, STOP = \
-        ('AUTO', 'NORM', 'SINGLE', 'STOP')
-    DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE, SIXTEEN, TRIPLE, HEX = \
-        ('DUAL', 'QUAD', 'OCTAL', 'XY', 'XYSINGLE', 'XYDUAL', 'TANDEM', 'QUATTRO', 'TWELVE', 'SIXTEEN', 'TRIPLE', 'HEX')
-    # hardcopy
-    BMP, JPEG, PNG, TIFF = ('BMP', 'JPEG', 'PNG', 'TIFF')
-    FOLDER, FILE = (9, 11)
-    # Waveform mode
-    BYTE, INTEGER, SCALED, NATIVE = (0, 1, 2, 3)
-    C1, C2, C3, C4, M1, M2, M3, M4, Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, F1, F2, F3, F4, F5, F6, F7, F8 = \
-        ("C1", "C2", "C3", "C4", "M1", "M2", "M3", "M4",
-         "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8",
-         "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8")
-    ON, OFF = ("ON", 'OFF')
-
-    # Setup slot
-    S1, S2, S3, S4, S5, S6 = (0, 1, 2, 3, 4, 5)
-
-    # List
-    SCOPE_MODES = (LOCAL, REMOTE)
-    TRIG_MODES = (AUTO, NORM, SINGLE, STOP)
-    HARDCOPY_DEVICES = (BMP, JPEG, PNG, TIFF)
-    WAVEFORM_MODES = (BYTE, INTEGER, SCALED, NATIVE)
-    WAVEFORM_CHANNELS = (C1, C2, C3, C4, Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, F1, F2, F3, F4, F5, F6, F7, F8)
-    INTERNAL_MEMORY = (M1, M2, M3, M4)
-    DISPLAY_STATE = (ON, OFF)
-    AUTO_CALIBRATION = (ON, OFF)
-    TRACE_STATE = DISPLAY_STATE
-    TRACE_CHANNELS = WAVEFORM_CHANNELS
-    GRID_STATE = (AUTO, SINGLE, DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE, SIXTEEN, TRIPLE, HEX)
-    SETUP_SLOT = (S1, S2, S3, S4, S5, S6)
-
-    def __init__(self, address):
-        self._address = None
-        self._is0pen = False
+    def __init__(self, address=None):
+        self._is_open = False
         self._instance = None
-        self._identifier = None
         self._mode = None
-        self._timeout = 1
-        self._trigger_mode = None
-        self._calibration = None
+        self._timeout = None
+        self.open(address)
 
-        self._logger = logging.getLogger(__name__)
-
-        if not address:
-            # empty address
-            self._logger.warning("An empty address has been  provided...")
-            sys.exit()
-        else:
-            self._address = address
-            self.open()
+    def __del__(self):
+        if self._is_open:
+            self.close()
 
     # ----------------------------------------------------------------------- #
-    def open(self):
+    def open(self, address):
         """
         Create a connection with the device and setup in remote mode
 
+        :param address: IP Address
         :return:
         """
         self._instance = win32com.client.Dispatch("LeCroy.ActiveDSOCtrl.1")
         """ Create Connection with device """
-        if self._instance.MakeConnection("IP:" + self._address):
-            self._logger.info("Connexion established...")
-            self._is0pen = True
-            self.set_timeout(self._timeout)
-            self.set_mode(self.REMOTE)
+
+        if self._instance.MakeConnection(address):
+            self._is_open = True
+            self.timeout = 1
+            self.mode = RemoteModes.REMOTE
             self.beep()
         else:
-            self._logger.warning("Connection with scope failed...")
-            sys.exit(-1)
-    # ----------------------------------------------------------------------- #
+            sys.exit("Connection with scope failed...")
 
     def close(self):
         """
@@ -99,355 +187,414 @@ class Lecroy:
         mode before closing.
 
         """
-        self.set_mode(self.LOCAL)
+        self.mode = RemoteModes.LOCAL
         if self._instance.Disconnect():
-            self._is0pen = False
-        else:
-            self._logger.warning("Dis-connection with scope failed...")
+            self._is_open = False
 
     # ----------------------------------------------------------------------- #
-
-    @property
-    def address(self):
-        """
-        Return the device address. This method return the private variable.
-
-        :return:  address value
-        """
-        return self._address
-    # ----------------------------------------------------------------------- #
-
-    def set_address(self, address):
-        """
-        Set IP address. This method close previous session if opened, and
-        perform a new opening session using the new address.
-
-        :param address:
-        :return:
-        """
-        """ set ip address """
-        if address is None:
-            raise ValueError("Address value must be provided...")
-        if self._is0pen:
-            self.close()
-        self._address = address
-        self.open()
-
-    # ----------------------------------------------------------------------- #
-
     @property
     def mode(self):
         """
-        Get the current scope mode. This method return the private variable.
+        Get the current scope mode.
 
         :return: device mode.
         """
         return self._mode
 
-    # ----------------------------------------------------------------------- #
-
-    def set_mode(self, mode):
+    @mode.setter
+    def mode(self, mode):
         """
-        Set the scope mode (remote or local
+        Set the scope mode (remote or local)
+
         :param mode:
         :return:
         """
-        if mode not in self.SCOPE_MODES:
+        if mode not in RemoteModes.MODES:
             raise ValueError("Not a valid mode...")
 
-        if self._is0pen:
+        if self._is_open:
             if self._instance.SetRemoteLocal(mode):
                 self._mode = mode
-            else:
-                self._logger.warning("set mode failed...")
 
     # ----------------------------------------------------------------------- #
+    @property
+    def timeout(self):
+        return self._timeout
 
-    def set_timeout(self, value):
+    @timeout.setter
+    def timeout(self, value):
         """
+        This method sets the time that the control will wait for a response from the instrument.
+        The methods to which this applies are:
+            ReadString, ReadBinary, WaitForOPC, GetByteWaveform, GetIntegerWaveform GetNativeWaveform,
+            GetScaledWaveform, GetScaledWaveformWithTimes
 
-        :param value:
-        :return:
+        :param value: Single, Time-out time in seconds
         """
         if self._instance.SetTimeout(value):
             self._timeout = value
-        else:
-            self._logger.warning("Set timeout failed...")
 
     # ----------------------------------------------------------------------- #
-    def get_hardcopy_full_setup(self):
-        """
-        Get all hard-copy setup
+    # HARDCOPY - Printing the Display/Screen Capture
+    # ----------------------------------------------------------------------- #
 
-        :return: return the complete of hardware setup as a list.
+    def get_hardcopy(self) -> dict:
+        """
+        Get all hardcopy setup
+
+        :return: return the complete of hardware setup as a dict.
         """
         if self._instance.WriteString("HCSU?", True):
-            return self._instance.ReadString(5000).split(",")
+            result = self._instance.ReadString(5000).split(',')
+            return dict(zip(result[::2], result[1::2]))
 
-    def get_hardcopy(self, index):
+    def set_hardcopy(self, config: dict):
         """
-        Get and print hardcopy directory
+        Set hardcopy parameter from dictionnary
 
-        :return: hardcopy directory from hardware setup
+        :param config: A dictionnary containing one or several harcopy paramterer
         """
-        setup = self.get_hardcopy_full_setup()
-        self._logger.info("Hardcopy directory : " + setup[index])
-        return setup[index]
+        # convert dictionnary into list
+        new_list = zip(config.keys(), config.values())
+        new_list = list(new_list)
 
-    def set_hardcopy(self, device, directory, name):
-        """
-        Partial hard-copy setup.
+        fields = []
+        for i in new_list:
+            item, value = i
+            fields.append("{0},{1},".format(item, value))
 
-        :param device: print screen file format
-        :param directory: print screen directory
-        :param name: file name
-        :exception: ValueError:
-        """
-        if device not in self.HARDCOPY_DEVICES:
-            raise ValueError("Not a valid device value...")
-
-        # Create MAUI command
-        cmd = "HCSU DEV,{0},DIR,\"{1}\",FILE,\"{2}\" ".format(device, directory, name)
-        if not self._instance.WriteString(cmd, True):
-            self._logger.warning("Print screen command failed...")
+        params = ''.join(fields)
+        cmd = 'HCSU ' + params[:-1]
+        self._instance.WriteString(cmd, True)
+        while not self._instance.WaitForOPC():
+            pass
 
     # ----------------------------------------------------------------------- #
-    def store_hardcopy(self, name):
+    def store_hardcopy(self, name, form='BMP'):
         """
-        Store an hardcopy file form scope to PC.
+        Store an hardcopy file from scope to PC.
 
         :param name: file name
-        :return:
+        :param form: Hardcopy format
+        :return: None
         """
-        if not self._instance.StoreHardcopyToFile("BMP", "BCKG, WHITE", name):
-            self._logger.warning("hardcopy failed...")
+        self._instance.StoreHardcopyToFile(form, "", name)
 
     # ----------------------------------------------------------------------- #
 
-    def print_screen(self):
+    def screen_dump(self):
         """
-        Perform a print screen. See set_hardcopy method
+        Perform a screen dump. See set_hardcopy method
 
         :return:
         """
-        if not self._instance.WriteString("SCDP", True):
-            self._logger.warning("Print screen command failed...")
+        self._instance.WriteString("SCDP", True)
+
+    # ----------------------------------------------------------------------- #
+    # ACQUISITION - Controlling Waveform Captures
+    # ----------------------------------------------------------------------- #
+
+    def set_waveform_transfer(self, first_point=0, segment=0):
+        """
+        configures parameters controlling the waveform transfer
+
+        :param  first_point: Integer, The index of the first point to transfer (0 = first point).
+        :param  segment: Integer, Segment number to transfer (0 = all segments).
+
+        :notes:
+            This method affects how the various GetWaveform functions transfer a waveform. For the majority of cases the
+            default settings will be sufficient. These are Start Transfer at first point, Transfer all data points Transfer all segments.
+        """
+        self._instance.SetupWaveformTransfer(first_point, 0, segment)
 
     # ----------------------------------------------------------------------- #
 
-    def delete_hardcopy(self, name):
-        raise NotImplemented
+    def get_waveform_transfer(self):
+        """
+        Get Waveform setup information
 
+        :return: A dictionnary
+        :rtype: dict
+
+        """
+        if self._instance.WriteString("WFSU?", True):
+            value = self._instance.ReadString(50)
+            setup = {}
+            (setup["Sparsing"]) = self._instance.GetCommaDelimitedString(value, 1)
+            (setup["Number"]) = self._instance.GetCommaDelimitedString(value, 3)
+            (setup["First"]) = self._instance.GetCommaDelimitedString(value, 5)
+            (setup["Segment"]) = self._instance.GetCommaDelimitedString(value, 7)
+            return setup
     # ----------------------------------------------------------------------- #
-    def set_waveform_transfer(self, first_point):
-        """ configures parameters controlling the waveform transfer """
-        if not self._instance.SetupWaveformTransfer(first_point, 0, 0):
-            self._logger.warning("set waveform command failed...")
 
-    # ----------------------------------------------------------------------- #
-
-    def get_wave(self, mode, name, max_bytes, first_byte):
+    def get_wave(self, mode, name, max_bytes):
         """
         Get a wave from scope, and return it
 
         :param mode: mode (BYTE, INTEGER, SCALED, NATIVE)
         :param name: channel name
         :param max_bytes: maximum byte
-        :param first_byte: first byte index
         :return: list of waveform values
+
+        :notes: For NATIVE WaveForm, 12-bit oscilloscopes must use the 16-bit word format. Set maxBytes value as <number of bytes to read> x 2.
+
         """
-        if mode not in self.WAVEFORM_MODES:
+        wave = None
+        if mode not in WaveForms.MODES:
             raise ValueError("Not a valid get waveform mode...")
-        if name not in self.WAVEFORM_CHANNELS:
+        if name not in Channels.NAMES:
             raise ValueError("Not a valid channel...")
-        if mode == self.BYTE:
-            wave = self._instance.GetByteWaveform(name, max_bytes, 0)
-        else:
-            raise ValueError("Not a supported get waveform mode...")
-        return wave[first_byte:]
+        if mode not in WaveForms.MODES:
+            raise ValueError("Not a valid transfer mode...")
 
-    # ----------------------------------------------------------------------- #
+        if mode == WaveForms.BYTE:
+            wave = list(self._instance.GetByteWaveform(name, max_bytes, 0))
+        elif mode == WaveForms.INTEGER:
+            wave = self._instance.GetIntegerWaveform(name, max_bytes, 0)
+        elif mode == WaveForms.SCALED:
+            wave = self._instance.GetScaledWaveform(name, max_bytes, 0)
+        elif mode == WaveForms.NATIVE:
+            wave = self._instance.GetNativeWaveform(name, max_bytes, False, 'ALL')
+        return wave
 
-    def get_wave_to_file(self, filename, mode, name, max_bytes, first_byte=0):
-        """
-        get a waveform and sva into a file. If file already exist then is
-        overwritten.
-
-        :param filename:
-        :param mode:
-        :param name:
-        :param max_bytes:
-        :param first_byte:
-        :return:
-        """
-        filemode = "wb"
-        # get data trace from scope.
-        data = self.get_wave(mode, name, max_bytes, first_byte)
-
-        f = open(filename, filemode)
-        f.write(data)
-        f.close()
-
-    @staticmethod
-    def display_wave(filename=""):
-        """
-        Display to screen a trace from file. be careful to type
-
-        :param filename: trace file
-        """
-        with open(filename, 'rb') as f:
-            array = np.frombuffer(f.read(), dtype=np.uint8)
-        plt.plot(array)
-        plt.show()
     # ----------------------------------------------------------------------- #
 
     @property
     def trigger_mode(self):
         """
-        Return the internal trigger mode
-
-        :return: trigger mode
-        """
-        return self._trigger_mode
-
-    def set_trigger_mode(self, mode):
-        """
-        Set trigger mode
-
-        :param mode: trigger mode part of TRIG_MODES
-        """
-        if self._is0pen:
-            if mode not in self.TRIG_MODES:
-                raise ValueError("Not a Valid mode...")
-
-            if not self._instance.WriteString("TRMD " + mode, True):
-                self._logger.warning("set trigger mode command failed...")
-            # Waiting scope available...
-            while not self._instance.WaitForOPC():
-                pass
-
-    def get_trigger_mode(self):
-        """
         Return current trigger mode
 
         :return: trigger mode
         """
-        if self._is0pen:
-            if self._instance.WriteString("TRMD?", True):
-                self._trigger_mode = self._instance.ReadString(80)
+        if self._instance.WriteString("TRMD?", True):
+            return self._instance.ReadString(80)
 
-    def arm(self):
+    @trigger_mode.setter
+    def trigger_mode(self, mode):
+        """
+        Set trigger mode
+
+        :param mode: trigger mode
+        """
+        if mode not in TriggerModes.MODES:
+            raise ValueError("Not a Valid mode...")
+        self._instance.WriteString("TRMD " + mode, True)
+        while not self._instance.WaitForOPC():
+            pass
+
+    def trigger_arm(self):
         """
         Arm the scope for single mode
-
         """
-        self.set_trigger_mode(self.SINGLE)
+        self.trigger_mode = TriggerModes.SINGLE
 
+    def wait(self, timeout=1):
+        self._instance.WriteString("WAIT {0}".format(timeout), True)
+        while not self._instance.WaitForOPC():
+            pass
+
+    @property
+    def sequence(self):
+        """
+        Return Conditions for the sequence acquisition
+
+        :return: Return sequence activation flag, number sequences and memory length
+        :rtype: String
+        """
+        if self._instance.WriteString("SEQUENCE?", True):
+            value = self._instance.ReadString(10)
+            setup = {}
+            (setup["Mode"]) = self._instance.GetCommaDelimitedString(value, 0)
+            (setup["Segments"]) = self._instance.GetCommaDelimitedString(value, 1)
+            (setup["Size"]) = self._instance.GetCommaDelimitedString(value, 2)
+            return setup
+
+    def set_sequence(self, mode, segment, size):
+        """
+        Set conditions for the sequence acquisition.
+
+        :param mode: ON or OFF
+        :param segment: number segment
+        :param size: memory length
+
+        :note:
+
+        The size value can be expressed either as numeric fixed point, exponential, or using standard suffixes
+        """
+        if mode not in Sequence.MODES:
+            raise ValueError("Not a valid mode...")
+        return self._instance.WriteString("SEQUENCE {0},{1},{2}".format(mode, segment, size), True)
+
+    # ----------------------------------------------------------------------- #
+    # CURSOR - Performing Measurements
     # ----------------------------------------------------------------------- #
 
     def get_parameter(self, name, parameter):
         """
+        Return a channel parameters(s)
 
-
-        :param name:
-        :param parameter:
-        :return:
+        :param name: Channel Name in Channels constant class
+        :param parameter: Channel Parameter in Parameters class
+        :return: Parameter value
         """
-        if name not in self.WAVEFORM_CHANNELS:
+        if name not in Channels.NAMES:
             raise ValueError("Not a valid channel...")
+        if parameter not in Parameters.NAMES:
+            raise ValueError("Not a valid parameter...")
         cmd = "{0}:PAVA? {1}".format(name, parameter)
-        if self._instance.WriteString(cmd, 1):
+        if self._instance.WriteString(cmd, True):
             return self._instance.ReadString(1000)
 
     # ----------------------------------------------------------------------- #
-    def set_panel(self, panel):
-        self._instance.SetPanel(panel)
+    # SAVE/RECALL SETUP - Perserving and Restoring Panel Settings
+    # ----------------------------------------------------------------------- #
 
-    def get_panel(self):
+    @property
+    def panel(self):
         """
-
+        The Panel property reads the instrument's control state into a String,
+        allowing a future call to SetPanel to reproduce the state.
         """
         return self._instance.GetPanel()
 
     # ----------------------------------------------------------------------- #
-    # Display Commands and Queries
-
-    def display(self, state):
+    @panel.setter
+    def panel(self, panel: str):
         """
+        The Panel setter sets the instrument's control state using a panel
+        string captured using the panel property.
 
-        :param state:
-        :exception: ValueError: display state value not supported
+        :param panel: panel string used
+
         """
-        if state not in self.DISPLAY_STATE:
-            raise ValueError("Display state not supported...")
-        cmd = "DISP {0}".format(state)
-        self._instance.WriteString(cmd, True)
+        self._instance.SetPanel(panel)
 
-    def show_grid(self, grid):
-        """
-        Change scope grid format
-
-        :param grid: grd format
-        :exception ValueError: grid value not supported
-        """
-        if grid not in self.GRID_STATE:
-            raise ValueError("Grid mode not supported...")
-        cmd = "GRID {0}".format(grid)
-        self._instance.WriteString(cmd, True)
-
-    def show_message(self, msg):
-        """
-        Show a custom message to the screen
-
-        :param msg: message
-        """
-        cmd = "MSG {0}".format(msg)
-        self._instance.WriteString(cmd, True)
-
-    def show_trace(self, trace, state):
-        """
-        Display/ Doesn't display a channel to the scope screen.
-
-        :param trace: trace channel number
-        :param state: ON / OFF
-        """
-        if (trace not in self.WAVEFORM_CHANNELS) and (trace not in self.INTERNAL_MEMORY):
-            raise ValueError("Trace selected not supported...")
-        if state not in self.TRACE_STATE:
-            raise ValueError("state selected not supported...")
-        cmd = "{0}:TRA {1}".format(trace, state)
-        self._instance.WriteString(cmd, True)
-
-    def save_memory(self, trace, memory):
+    # ----------------------------------------------------------------------- #
+    # WAVEFORM TRANSFER - Preserving and Restoring Waveforms
+    # ----------------------------------------------------------------------- #
+    def save_memory(self, channel, memory):
         """
         Save a trace in an internal memory slot
 
-        :param trace: trace channel number
+        :param channel: trace channel number
         :param memory: memory slot n umber
-        """
-        if trace not in self.WAVEFORM_CHANNELS:
-            raise ValueError("Trace selected not supported...")
-        if memory not in self.INTERNAL_MEMORY:
-            raise ValueError("Memory selected not supported...")
-        cmd = "STO {0},{1}".format(trace, memory)
-        self._instance.WriteString(cmd, True)
+        :return: Write command status
 
+        :exception: ValueError: Trace selected not supported...
+        :exception: ValueError: Memory selected not supported...
+        """
+        if channel not in Channels.NAMES:
+            raise ValueError("Trace selected not supported...")
+        if memory not in Memories.NAMES:
+            raise ValueError("Memory selected not supported...")
+        cmd = "STO {0},{1}".format(channel, memory)
+        return self._instance.WriteString(cmd, True)
+
+    # ----------------------------------------------------------------------- #
+    # SAVE/RECALL SETUP - Perserving and Restoring Panel Settings
+    # ----------------------------------------------------------------------- #
     def recall_setup(self, setup):
         """
         Recall a setup stored in an internal setup slot
 
         :param: setup slot number
+        :return: Write command status
+
+        :exception: ValueError: Setup slot selected not supported..
         """
-        if setup not in self.SETUP_SLOT:
+        if setup not in Setups.SLOTS:
             raise ValueError("Setup slot selected not supported...")
         cmd = "*RCL {0}".format(setup)
+        return self._instance.WriteString(cmd, True)
+
+    def save_setup(self, setup):
+        """
+        Save a setup stored in an internal setup slot
+
+        :param: setup slot number
+        :return: Write command status
+
+        :exception: ValueError: Setup slot selected not supported..
+        """
+        if setup not in Setups.SLOTS:
+            raise ValueError("Setup slot selected not supported...")
+        cmd = "*SAV {0}".format(setup)
+        return self._instance.WriteString(cmd, True)
+
+    # ----------------------------------------------------------------------- #
+    # Display Commands and Queries
+    # ----------------------------------------------------------------------- #
+
+    @property
+    def display(self):
+        """
+        Get display mode
+        :return: ON or OFF
+        """
+        if self._instance.WriteString("DISP?", True):
+            return self._instance.ReadString(10)
+
+    @display.setter
+    def display(self, state):
+        """
+        Set display mode
+
+        :param state: ON or OFF
+        :exception: ValueError: display state value not supported
+
+        :notes:
+        When you set the display to OFF, the screen does not actually go blank. Instead, the real-time
+        clock and the message field are continuously updated. but waveforms and associated text are frozen.
+        """
+        if state not in Display.STATES:
+            raise ValueError("Display state not supported...")
+        cmd = "DISP {0}".format(state)
         self._instance.WriteString(cmd, True)
+
+    @property
+    def grid(self):
+        """
+        return the style of grid used
+        """
+        if self._instance.WriteString("GRID?", True):
+            return self._instance.ReadString(10)
+
+    @grid.setter
+    def grid(self, grid):
+        """
+        Change scope grid format
+
+        :param grid: grid format
+        :exception ValueError: Grid mode not supported
+        """
+        if grid not in GridStates.STATES:
+            raise ValueError("Grid mode not supported...")
+        cmd = "GRID {0}".format(grid)
+        self._instance.WriteString(cmd, True)
+        while not self._instance.WaitForOPC():
+            pass
+
+    def display_channel(self, name, state):
+        """
+        Display/ Doesn't display a channel to the scope screen.
+
+        :param name: trace channel number
+        :param state: ON / OFF
+        :return: Write command status
+        """
+        if (name not in Channels.NAMES) and (name not in Memories.NAMES):
+            raise ValueError("Channel name selected not supported...")
+        if state not in Display.STATES:
+            raise ValueError("state selected not supported...")
+        cmd = "{0}:TRA {1}".format(name, state)
+        self._instance.WriteString(cmd, True)
+        while not self._instance.WaitForOPC():
+            pass
 
     # ----------------------------------------------------------------------- #
     def clear(self, reboot):
         """
         Clear device with reboot option
-
         """
         if isinstance(reboot, bool):
             self._instance.DeviceClear(reboot)
@@ -455,63 +602,52 @@ class Lecroy:
     def beep(self):
         """
         Execute a beep
-
+        :return: Write command status
         """
-        self._instance.WriteString("BUZZ BEEP", 1)
-
-    @property
-    def calibration(self):
-        """
-        Return calibration result.
-
-        :return: calibration result
-        """
-        return self._calibration
+        return self._instance.WriteString("BUZZ BEEP", 1)
 
     def calibrate(self):
         """
-        Execute a calibration. The result is saved.
-
-        :return:
+        Execute a calibration.
         """
         if self._instance.WriteString("*CAL?", True):
-            self._calibration = self._instance.ReadString(10)
-        else:
-            self._logger.warning("Calibration command failed...")
+            # Waiting scope available...
+            while not self._instance.WaitForOPC():
+                pass
 
-    def set_auto_calibration(self, state):
+    @property
+    def auto_calibration(self):
+        """
+        Get the auto calibration flag
+
+        :return: ON or OFF
+        """
+        cmd = "ACAL?"
+        if self._instance.WriteString(cmd, True):
+            return self._instance.ReadString(3)
+
+    @auto_calibration.setter
+    def auto_calibration(self, state):
         """
         Enable / Disable Auto calibration
 
         :param state: ON or OFF
+
         :exception: ValueError: Auto calibration state value not supported
         """
-        if state not in self.AUTO_CALIBRATION:
+        if state not in Calibration.STATES:
             raise ValueError("Auto calibration state not supported...")
-        cmd = "AUTO_CALIBRATE {0}".format(state)
+        cmd = "ACAL {0}".format(state)
         self._instance.WriteString(cmd, True)
-
-    def get_auto_calibration(self):
-        cmd = "AUTO_CALIBRATE?"
-        if  self._instance.WriteString(cmd, True):
-            return self._instance.ReadString(3)
 
     @property
     def identifier(self):
         """
-        Return the identifier field. A call to identify method shall be previously
-        executed.
-
-        :return:
-        """
-        return self._identifier
-
-    def identify(self):
-        """
         Get scope identifier field.
 
+        :return: Identifier information string
         """
         if self._instance.WriteString("*IDN?", True):
-            self._identifier = self._instance.ReadString(80)
+            return self._instance.ReadString(80)
     # ----------------------------------------------------------------------- #
     # ----------------------------------------------------------------------- #

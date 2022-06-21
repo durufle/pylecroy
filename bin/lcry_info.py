@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 from pylecroy.pylecroy import Lecroy
+from pylecroy.pylecroy import Channels
+
 import sys
 
 VERSION = '0.1.0'
@@ -9,8 +11,11 @@ USAGE = '''
 Return information from Lecroy
 
 Usage:
-    python lecroy_info.py -a 10.67.16.22
-
+    python lecroy_info.py -a "IP:10.67.16.22"
+    python lcry_info.py -a "IP:10.67.16.22"
+    python lcry_info.py -a "USBTMC:<Host Name>"
+    ...
+        
 Options:
     -h, --help              this help message.
     -v, --version           version info.
@@ -45,18 +50,19 @@ def main(argv=None):
 
     # Load default value
     if address is None:
-        print("scope IP address must be provide...")
+        print("scope address must be provide...")
         print(USAGE)
         return 2
 
     scope = Lecroy(address)
 
     # Get scope identifier identify
-    scope.identify()
-    print("scope identifier             : {} ".format(scope.identifier))
-    scope.get_trigger_mode()
-    print("get trigger mode             : {} ".format(scope.trigger_mode))
-    print("get auto calibration         : {} ".format(scope.get_auto_calibration()))
+    print(f"scope identifier             : {scope.identifier}")
+    print(f"get trigger mode             : {scope.trigger_mode}")
+    print(f"get auto calibration         : {scope.auto_calibration}")
+    print(f"Display state                : {scope.display}")
+    print(f"Grid mode                    : {scope.grid}")
+
     scope.close()
 
 
