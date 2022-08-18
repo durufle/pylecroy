@@ -45,7 +45,7 @@ def main(argv=None):
 
     # Load default value
     if address is None:
-        print("scope IP address must be provide...")
+        sys.stderr.write("scope address must be provide...\n")
         print(USAGE)
         return 2
 
@@ -54,45 +54,45 @@ def main(argv=None):
     # Get scope identifier property
     print("scope identifier : {} ".format(scope.identifier))
     print("Set trigger STOP...")
-    scope.trigger_mode = TriggerModes.STOP
+    scope.trigger_mode = Trigger.Modes.STOP
 
     print("Enable sequence Mode...")
-    scope.set_sequence(Sequence.ON, 10, 500000)
+    scope.set_sequence(Sequence.Modes.ON, 10, 500000)
     print("Get sequence setup...")
     seq_setup = scope.sequence
     print(seq_setup)
 
     print("Channels  OFF...")
-    for channel in Channels.NAMES:
-        scope.display_channel(channel, "OFF")
+    for channel in WaveForm.Channels:
+        scope.display_channel(channel.value, "OFF")
 
-    for Memory in Memories.NAMES:
-        scope.display_channel(Memory, "OFF")
+    for memory in WaveForm.Memories:
+        scope.display_channel(memory.value, "OFF")
 
     input("Set calibration signal to C1 and Press a key to continue...")
 
     print("ShowChannels C1...")
-    scope.display_channel(Channels.C1, "ON")
+    scope.display_channel("C1", "ON")
 
     number = 1
     print("Defined Waveform transfer mode... segment = {0}".format(number))
     scope.set_waveform_transfer(first_point=0, segment=number)
     print("Get Waveform setup...")
-    wave_setup = scope.get_waveform_transfer()
+    wave_setup = scope.waveform_transfer
     print(wave_setup)
 
     print("Disable auto calibration...")
-    scope.auto_calibration = Calibration.OFF
+    scope.auto_calibration = Calibration.States.OFF
 
     array = [[]]
 
     print("Set trigger SINGLE...")
-    scope.trigger_mode = TriggerModes.SINGLE
+    scope.trigger_mode = Trigger.Modes.SINGLE
     print("Wait for acquisition...")
     scope.wait(timeout=10)
 
     for acquit in range(0, 1):
-        trace = scope.get_wave(WaveForms.INTEGER, Channels.C1, 500000)
+        trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 500000)
         array.insert(acquit, np.array(trace, dtype=np.int32))
         plt.plot(array[acquit])
         plt.title('Acquisition {0}'.format(acquit))
@@ -100,7 +100,7 @@ def main(argv=None):
 
     input("press a key to exit...")
     print("Disable sequence Mode...")
-    scope.set_sequence(Sequence.OFF, 10, 500000)
+    scope.set_sequence(Sequence.Modes.OFF, 10, 500000)
 
     scope.close()
 

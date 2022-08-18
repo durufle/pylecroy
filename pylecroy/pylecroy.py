@@ -36,11 +36,11 @@ class MyEnumMeta(enum.EnumMeta):
             #
             import warnings
             warnings.warn(
-                    "in 3.12 __contains__ will no longer raise TypeError, but will return True if\n"
-                    "obj is a member or a member's value",
-                    DeprecationWarning,
-                    stacklevel=2,
-                    )
+                "in 3.12 __contains__ will no longer raise TypeError, but will return True if\n"
+                "obj is a member or a member's value",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             raise TypeError(
                 "unsupported operand type(s) for 'in': '%s' and '%s'" % (
                     type(item).__qualname__, cls.__class__.__qualname__))
@@ -185,6 +185,7 @@ class Lecroy:
     """
     Class to drive a Lecroy oscilloscope using ActiveDSO active X
     """
+
     def __init__(self, address=None):
         self._is_open = False
         self._instance = None
@@ -248,7 +249,7 @@ class Lecroy:
             raise ValueError("Not a valid mode...")
 
         if self._is_open:
-            if self._instance.SetRemoteLocal(mode):
+            if self._instance.SetRemoteLocal(mode.value):
                 self._mode = mode
 
     # ----------------------------------------------------------------------- #
@@ -357,6 +358,7 @@ class Lecroy:
             (setup["First"]) = self._instance.GetCommaDelimitedString(value, 5)
             (setup["Segment"]) = self._instance.GetCommaDelimitedString(value, 7)
             return setup
+
     # ----------------------------------------------------------------------- #
 
     def get_wave(self, mode, name, max_bytes):
@@ -390,25 +392,25 @@ class Lecroy:
     # ----------------------------------------------------------------------- #
 
     @property
-    def trigger_mode(self):
+    def trigger_mode(self) -> Trigger.Modes:
         """
         Return current trigger mode
 
         :return: trigger mode
         """
         if self._instance.WriteString("TRMD?", True):
-            return self._instance.ReadString(80)
+            return Trigger.Modes(self._instance.ReadString(80))
 
     @trigger_mode.setter
-    def trigger_mode(self, mode):
+    def trigger_mode(self, mode: Trigger.Modes):
         """
         Set trigger mode
 
         :param mode: trigger mode
         """
-        if mode not in Trigger.Modes:
-            raise ValueError("Not a Valid mode...")
-        self._instance.WriteString("TRMD " + mode, True)
+        if not isinstance(mode, Trigger.Modes):
+            raise ValueError(f'Param is not a Trigger Modes : {mode}')
+        self._instance.WriteString(f"TRMD {mode.value}", True)
         while not self._instance.WaitForOPC():
             pass
 
@@ -613,9 +615,9 @@ class Lecroy:
         :return: Write command status
         """
         if name not in WaveForm.Channels and name not in WaveForm.Zooms and name not in WaveForm.Functions and \
-            name not in WaveForm.Memories:
+                name not in WaveForm.Memories:
             raise ValueError("Channel name selected not supported...")
-        if state not in Display.STATES:
+        if state not in Display.States:
             raise ValueError("state selected not supported...")
         cmd = "{0}:TRA {1}".format(name, state)
         self._instance.WriteString(cmd, True)
@@ -647,7 +649,7 @@ class Lecroy:
                 pass
 
     @property
-    def auto_calibration(self):
+    def auto_calibration(self) -> Calibration.States:
         """
         Get the auto calibration flag
 
@@ -655,19 +657,19 @@ class Lecroy:
         """
         cmd = "ACAL?"
         if self._instance.WriteString(cmd, True):
-            return self._instance.ReadString(3)
+            return Calibration.States(self._instance.ReadString(3))
 
     @auto_calibration.setter
-    def auto_calibration(self, state):
+    def auto_calibration(self, state: Calibration.States):
         """
         Enable / Disable Auto calibration
 
         :param state: ON or OFF
         :exception: ValueError: Auto calibration state value not supported
         """
-        if state not in Calibration.STATES:
-            raise ValueError("Auto calibration state not supported...")
-        cmd = "ACAL {0}".format(state)
+        if not isinstance(state, Calibration.States):
+            raise ValueError(f'Param is not a Calibration states : {state}')
+        cmd = "ACAL {0}".format(state.value)
         self._instance.WriteString(cmd, True)
 
     @property

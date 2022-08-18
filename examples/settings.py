@@ -58,16 +58,16 @@ def main(argv=None):
     # Trigger setting
     trigger = scope.trigger_mode
     print(f"Trigger mode             : {trigger}")
-    for mode in TriggerModes.MODES:
-        scope.trigger_mode = mode
+    for mode in Trigger.Modes:
+        scope.trigger_mode = mode.value
         print(f"Trigger mode             : {scope.trigger_mode}")
 
     # Auto calibration
     cal = scope.auto_calibration
     print(f"Auto calibration         : {cal}")
-    scope.auto_calibration = Calibration.OFF
+    scope.auto_calibration = Calibration.States.OFF
     print(f"Auto calibration         : {scope.auto_calibration}")
-    scope.auto_calibration = cal
+    scope.auto_calibration = Calibration.States.ON
     print(f"Auto calibration         : {scope.auto_calibration}")
 
     # Grid

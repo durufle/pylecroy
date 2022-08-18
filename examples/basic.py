@@ -52,9 +52,9 @@ def main(argv=None):
     scope = Lecroy(address)
 
     # Get scope parameters
-    print(f"scope identifier             : {scope.identifier}")
-    print(f"get trigger mode             : {scope.trigger_mode}")
-    print(f"get auto calibration         : {scope.auto_calibration}")
+    print(f"Scope identifier             : {scope.identifier}")
+    print(f"Trigger mode                 : {scope.trigger_mode}")
+    print(f"Auto calibration             : {scope.auto_calibration}")
     print(f"Display state                : {scope.display}")
     print(f"Grid mode                    : {scope.grid}")
     print(f"Sequence condition           : {scope.sequence}")

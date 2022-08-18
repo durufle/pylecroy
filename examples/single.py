@@ -59,29 +59,29 @@ def main(argv=None):
     input("Set calibration signal to C1 and Press a key to continue...")
 
     print("Disable sequence Mode...")
-    scope.set_sequence(Sequence.OFF, 10, 500000)
+    scope.set_sequence(Sequence.Modes.OFF, 10, 500000)
 
     print("Set trigger STOP...")
-    scope.trigger_mode = TriggerModes.STOP
+    scope.trigger_mode = Trigger.Modes.STOP
 
     print("Channels  OFF...")
-    for channel in Channels.NAMES:
-        scope.display_channel(channel, "OFF")
+    for channel in WaveForm.Channels:
+        scope.display_channel(channel.value, "OFF")
 
-    for channel in Memories.NAMES:
-        scope.display_channel(channel, "OFF")
+    for memory in WaveForm.Memories:
+        scope.display_channel(memory.value, "OFF")
 
     print("ShowChannels C1...")
-    scope.display_channel(Channels.C1, "ON")
+    scope.display_channel("C1", "ON")
 
     print("Defined Waveform transfer mode...")
     scope.set_waveform_transfer(first_point=0, segment=0)
     print("Set trigger SINGLE...")
-    scope.trigger_mode = TriggerModes.SINGLE
+    scope.trigger_mode = Trigger.Modes.SINGLE
     print("Wait for acquisition...")
     scope.wait()
 
-    trace = scope.get_wave(WaveForms.INTEGER, Channels.C1, 500000)
+    trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 500000)
     if trace:
         array.insert(0, np.array(trace, dtype=np.int32))
         plt.plot(array[0])
