@@ -2,6 +2,7 @@
 
 import sys
 import logging
+import enum
 import win32com.client
 
 
@@ -26,60 +27,82 @@ class Const(object, metaclass=MetaConst):
         raise TypeError
 
 
-class RemoteModes(Const):
-    LOCAL = 0
-    REMOTE = 1
-    MODES = (LOCAL, REMOTE)
+class MyEnumMeta(enum.EnumMeta):
+    def __contains__(cls, item):
+        if not isinstance(item, enum.Enum):
+            if isinstance(item, str) or isinstance(item, int):
+                return item in [v.value for v in cls.__members__.values()]
+
+            #
+            import warnings
+            warnings.warn(
+                    "in 3.12 __contains__ will no longer raise TypeError, but will return True if\n"
+                    "obj is a member or a member's value",
+                    DeprecationWarning,
+                    stacklevel=2,
+                    )
+            raise TypeError(
+                "unsupported operand type(s) for 'in': '%s' and '%s'" % (
+                    type(item).__qualname__, cls.__class__.__qualname__))
+        return isinstance(item, cls) and item._name_ in cls._member_map_
 
 
-class TriggerModes(Const):
-    AUTO = 'AUTO'
-    NORMAL = 'NORM'
-    SINGLE = "SINGLE"
-    STOP = "STOP"
-    MODES = (AUTO, NORMAL, SINGLE, STOP)
+class Remote(Const):
+    class Modes(enum.Enum, metaclass=MyEnumMeta):
+        LOCAL = 0
+        REMOTE = 1
 
 
-class GridStates(Const):
-    AUTO = 'AUTO'
-    SINGLE = 'SINGLE'
-    DUAL = 'DUAL'
-    QUAD = 'QUAD'
-    OCTAL = 'OCTAL'
-    XY = 'XY'
-    XYSINGLE = 'XYSINGLE'
-    XYDUAL = 'XYDUAL'
-    TANDEM = 'TANDEM'
-    QUATTRO = 'QUATTRO'
-    TWELVE = 'TWELVE'
-    STATES = (AUTO, SINGLE, DUAL, QUAD, OCTAL, XY, XYSINGLE, XYDUAL, TANDEM, QUATTRO, TWELVE)
+class Trigger(Const):
+    class Modes(enum.Enum, metaclass=MyEnumMeta):
+        AUTO = 'AUTO'
+        NORMAL = 'NORM'
+        SINGLE = "SINGLE"
+        STOP = "STOP"
 
 
-class Channels(Const):
-    C1 = 'C1'
-    C2 = 'C2'
-    C3 = 'C3'
-    C4 = 'C4'
-    Z1 = "Z1"
-    Z2 = "Z2"
-    Z3 = "Z3"
-    Z4 = "Z4"
-    Z5 = "Z5"
-    Z6 = "Z6"
-    Z7 = "Z7"
-    Z8 = "Z8"
-    F1 = "F1"
-    F2 = "F2"
-    F3 = "F3"
-    F4 = "F4"
-    F5 = "F5"
-    F6 = "F6"
-    F7 = "F7"
-    F8 = "F8"
-    NAMES = (C1, C2, C3, C4, Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, F1, F2, F3, F4, F5, F6, F7, F8)
+class Grid(Const):
+    class States(enum.Enum, metaclass=MyEnumMeta):
+        AUTO = 'AUTO'
+        SINGLE = 'SINGLE'
+        DUAL = 'DUAL'
+        QUAD = 'QUAD'
+        OCTAL = 'OCTAL'
+        XY = 'XY'
+        XYSINGLE = 'XYSINGLE'
+        XYDUAL = 'XYDUAL'
+        TANDEM = 'TANDEM'
+        QUATTRO = 'QUATTRO'
+        TWELVE = 'TWELVE'
 
 
-class Parameters(Const):
+class WaveForm(Const):
+    class Channels(enum.Enum, metaclass=MyEnumMeta):
+        C1, C2, C3, C4 = ('C1', 'C2', 'C3', 'C4')
+
+    class Zooms(enum.Enum, metaclass=MyEnumMeta):
+        Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8 = ('Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8')
+
+    class Functions(enum.Enum, metaclass=MyEnumMeta):
+        F1, F2, F3, F4, F5, F6, F7, F8 = ('F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8')
+
+    class Memories(enum.Enum, metaclass=MyEnumMeta):
+        M1, M2, M3, M4 = ('M1', 'M2', 'M3', 'M4')
+
+    class Modes(enum.Enum, metaclass=MyEnumMeta):
+        BYTE, INTEGER, SCALED, NATIVE = (0, 1, 2, 3)
+
+    class Blocks(enum.Enum, metaclass=MyEnumMeta):
+        DESC, TEXT, TIME, DAT1, DAT2, ALL = ("DESC", 'TEXT', 'TIME', 'DAT1', 'DAT2', 'ALL')
+
+    class StoreModes(enum.Enum, metaclass=MyEnumMeta):
+        OFF, FILL, WRAP = ("OFF", "FILL", "WRAP")
+
+    class Formats(enum.Enum, metaclass=MyEnumMeta):
+        ASCII, BINARY, EXCEL, MATHCAD, MATLAB = ("ASCII", "BINARY", "EXCEL", "MATHCAD", "MATLAB")
+
+
+class Parameters(enum.Enum, metaclass=MyEnumMeta):
     # Parameters related constants
     ALL = 'ALL'
     AMPL = 'AMPL'
@@ -89,63 +112,73 @@ class Parameters(Const):
     FALL = 'FALL'
     MEAN = 'MEAN'
     PKPK = 'PKPK'
-    NAMES = (ALL, AMPL, DELAY, RISE, FALL, MEAN, PKPK)
-
-
-class Memories(Const):
-    M1 = 'M1'
-    M2 = 'M2'
-    M3 = 'M3'
-    M4 = 'M4'
-    NAMES = (M1, M2, M3, M4)
 
 
 class Display(Const):
-    ON = "ON"
-    OFF = "OFF"
-    STATES = (ON, OFF)
+    class States(enum.Enum, metaclass=MyEnumMeta):
+        ON = "ON"
+        OFF = "OFF"
 
 
-class Setups(Const):
-    S1 = 0
-    S2 = 1
-    S3 = 2
-    S4 = 3
-    S5 = 4
-    S6 = 5
-    SLOTS = (S1, S2, S3, S4, S5, S6)
+class Setup(Const):
+    class Slots(enum.Enum, metaclass=MyEnumMeta):
+        S1, S2, S3, S4, S5, S6 = (0, 1, 2, 3, 4, 5)
 
 
-class WaveForms(Const):
-    BYTE = 0
-    INTEGER = 1
-    SCALED = 2
-    NATIVE = 3
-    MODES = (BYTE, INTEGER, SCALED, NATIVE)
+class HardCopy(Const):
+    class Formats(enum.Enum, metaclass=MyEnumMeta):
+        BMP = 'BMP'
+        JPEG = 'JPEG'
+        PNG = 'PNG'
+        TIFF = 'TIFF'
+
+    class Indexes(enum.Enum, metaclass=MyEnumMeta):
+        IDX_FOLDER = 9
+        IDX_FILE = 11
 
 
-class Hardcopy(Const):
-    # Devices constant
-    BMP = 'BMP'
-    JPEG = 'JPEG'
-    PNG = 'PNG'
-    TIFF = 'TIFF'
-    DEVICE = (BMP, JPEG, PNG, TIFF)
-    # Index
-    IDX_FOLDER = 9
-    IDX_FILE = 11
+class Cursor(Const):
+    class Types(enum.Enum, metaclass=MyEnumMeta):
+        OFF, HREL, HABS, VREL, VABS = ("OFF", "HREL", "HABS", "VREL", "VABS")
+
+    class Readout(enum.Enum, metaclass=MyEnumMeta):
+        ABS, SLOPE, DELTA = ("ABS", "SLOPE", "DELTA")
 
 
 class Calibration(Const):
-    ON = 'ON'
-    OFF = 'OFF'
-    STATES = (ON, OFF)
+    class States(enum.Enum, metaclass=MyEnumMeta):
+        ON = 'ON'
+        OFF = 'OFF'
 
 
 class Sequence(Const):
-    ON = 'ON'
-    OFF = 'OFF'
-    MODES = (ON, OFF)
+    class Modes(enum.Enum, metaclass=MyEnumMeta):
+        ON = 'ON'
+        OFF = 'OFF'
+
+
+class Command(Const):
+    class Header(Const):
+        class Modes(enum.Enum, metaclass=MyEnumMeta):
+            ON = 'ON'
+            OFF = 'OFF'
+
+    class Help(Const):
+        class Levels(enum.Enum, metaclass=MyEnumMeta):
+            OFF = 'OFF'
+            EO = 'EO'
+            FD = 'FD'
+
+        class Reset(enum.Enum, metaclass=MyEnumMeta):
+            YES = 'YES'
+            NO = 'NO'
+
+
+class Disk(Const):
+    class Devices(enum.Enum, metaclass=MyEnumMeta):
+        HDD = 'HDD'
+        USB = 'USB'
+        MICRO = 'MICRO'
 
 
 class Lecroy:
@@ -178,7 +211,7 @@ class Lecroy:
         if self._instance.MakeConnection(address):
             self._is_open = True
             self.timeout = 1
-            self.mode = RemoteModes.REMOTE
+            self.mode = Remote.Modes.REMOTE
             self.beep()
         else:
             sys.exit("Connection with scope failed...")
@@ -189,7 +222,7 @@ class Lecroy:
         mode before closing.
 
         """
-        self.mode = RemoteModes.LOCAL
+        self.mode = Remote.Modes.LOCAL
         if self._instance.Disconnect():
             self._is_open = False
 
@@ -211,7 +244,7 @@ class Lecroy:
         :param mode:
         :return:
         """
-        if mode not in RemoteModes.MODES:
+        if mode not in Remote.Modes:
             raise ValueError("Not a valid mode...")
 
         if self._is_open:
@@ -339,20 +372,18 @@ class Lecroy:
 
         """
         wave = None
-        if mode not in WaveForms.MODES:
+        if mode not in WaveForm.Modes:
             raise ValueError("Not a valid get waveform mode...")
-        if name not in Channels.NAMES:
+        if name not in WaveForm.Channels:
             raise ValueError("Not a valid channel...")
-        if mode not in WaveForms.MODES:
-            raise ValueError("Not a valid transfer mode...")
 
-        if mode == WaveForms.BYTE:
+        if mode == WaveForm.Modes.BYTE:
             wave = list(self._instance.GetByteWaveform(name, max_bytes, 0))
-        elif mode == WaveForms.INTEGER:
+        elif mode == WaveForm.Modes.INTEGER:
             wave = self._instance.GetIntegerWaveform(name, max_bytes, 0)
-        elif mode == WaveForms.SCALED:
+        elif mode == WaveForm.Modes.SCALED:
             wave = self._instance.GetScaledWaveform(name, max_bytes, 0)
-        elif mode == WaveForms.NATIVE:
+        elif mode == WaveForm.Modes.NATIVE:
             wave = self._instance.GetNativeWaveform(name, max_bytes, False, 'ALL')
         return wave
 
@@ -375,7 +406,7 @@ class Lecroy:
 
         :param mode: trigger mode
         """
-        if mode not in TriggerModes.MODES:
+        if mode not in Trigger.Modes:
             raise ValueError("Not a Valid mode...")
         self._instance.WriteString("TRMD " + mode, True)
         while not self._instance.WaitForOPC():
@@ -385,7 +416,7 @@ class Lecroy:
         """
         Arm the scope for single mode
         """
-        self.trigger_mode = TriggerModes.SINGLE
+        self.trigger_mode = Trigger.Modes.SINGLE
 
     def wait(self, timeout=1):
         self._instance.WriteString("WAIT {0}".format(timeout), True)
@@ -420,7 +451,7 @@ class Lecroy:
 
         The size value can be expressed either as numeric fixed point, exponential, or using standard suffixes
         """
-        if mode not in Sequence.MODES:
+        if mode not in Sequence.Modes:
             raise ValueError("Not a valid mode...")
         return self._instance.WriteString("SEQUENCE {0},{1},{2}".format(mode, segment, size), True)
 
@@ -436,9 +467,9 @@ class Lecroy:
         :param parameter: Channel Parameter in Parameters class
         :return: Parameter value
         """
-        if name not in Channels.NAMES:
+        if name not in WaveForm.Channels and name not in WaveForm.Zooms and name not in WaveForm.Functions:
             raise ValueError("Not a valid channel...")
-        if parameter not in Parameters.NAMES:
+        if parameter not in Parameters:
             raise ValueError("Not a valid parameter...")
         cmd = "{0}:PAVA? {1}".format(name, parameter)
         if self._instance.WriteString(cmd, True):
@@ -482,9 +513,9 @@ class Lecroy:
         :exception: ValueError: Trace selected not supported...
         :exception: ValueError: Memory selected not supported...
         """
-        if channel not in Channels.NAMES:
+        if channel not in WaveForm.Channels and channel not in WaveForm.Zooms and channel not in WaveForm.Functions:
             raise ValueError("Trace selected not supported...")
-        if memory not in Memories.NAMES:
+        if memory not in WaveForm.Memories:
             raise ValueError("Memory selected not supported...")
         cmd = "STO {0},{1}".format(channel, memory)
         return self._instance.WriteString(cmd, True)
@@ -501,7 +532,7 @@ class Lecroy:
 
         :exception: ValueError: Setup slot selected not supported..
         """
-        if setup not in Setups.SLOTS:
+        if setup not in Setup.Slots:
             raise ValueError("Setup slot selected not supported...")
         cmd = "*RCL {0}".format(setup)
         return self._instance.WriteString(cmd, True)
@@ -515,7 +546,7 @@ class Lecroy:
 
         :exception: ValueError: Setup slot selected not supported..
         """
-        if setup not in Setups.SLOTS:
+        if setup not in Setup.Slots:
             raise ValueError("Setup slot selected not supported...")
         cmd = "*SAV {0}".format(setup)
         return self._instance.WriteString(cmd, True)
@@ -545,7 +576,7 @@ class Lecroy:
         When you set the display to OFF, the screen does not actually go blank. Instead, the real-time
         clock and the message field are continuously updated. but waveforms and associated text are frozen.
         """
-        if state not in Display.STATES:
+        if state not in Display.States:
             raise ValueError("Display state not supported...")
         cmd = "DISP {0}".format(state)
         self._instance.WriteString(cmd, True)
@@ -566,7 +597,7 @@ class Lecroy:
         :param grid: grid format
         :exception ValueError: Grid mode not supported
         """
-        if grid not in GridStates.STATES:
+        if grid not in Grid.States:
             raise ValueError("Grid mode not supported...")
         cmd = "GRID {0}".format(grid)
         self._instance.WriteString(cmd, True)
@@ -581,7 +612,8 @@ class Lecroy:
         :param state: ON / OFF
         :return: Write command status
         """
-        if (name not in Channels.NAMES) and (name not in Memories.NAMES):
+        if name not in WaveForm.Channels and name not in WaveForm.Zooms and name not in WaveForm.Functions and \
+            name not in WaveForm.Memories:
             raise ValueError("Channel name selected not supported...")
         if state not in Display.STATES:
             raise ValueError("state selected not supported...")
