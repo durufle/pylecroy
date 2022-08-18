@@ -19,13 +19,13 @@ before_script:
     - 'echo index = http://$DEVPI_HOST:3141/$DEVPI_INDEX/ >> $PIP_FILE'
     - 'echo [install] >> $PIP_FILE'
     - 'echo trusted-host = $DEVPI_HOST >> $PIP_FILE'
-    - pip install -r requirements.txt
+    - pip install -r integration.txt
 
 builds:
     stage: build
     script:
     - echo "Generate package and sphinx documentation"
-    - python setup.py bdist_wheel build_sphinx
+    - python setup.py bdist_wheel --plat-name win_amd64 build_sphinx
 
 production:
     stage: deploy

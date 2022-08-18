@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../../pylecroy'))
 # -- Project information -----------------------------------------------------
 
 project = 'PyLecroy'
-copyright = '2019, UL-IMS'
+copyright = '2022, UL Solutions'
 author = 'Laurent Bonnet'
 
 # The full version, including alpha/beta/rc tags
@@ -60,8 +60,10 @@ html_theme = 'alabaster'
 html_theme_options = {
 }
 
+autodoc_mock_imports = ["win32com"]
+
 # UL Logo
-html_logo = './_images/Ul_Red.png'
+html_logo = './_images/Ul_Solutions.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -71,7 +73,7 @@ html_logo = './_images/Ul_Red.png'
 today_fmt = "Generated on %b %d, %Y"
 
 latex_engine = 'xelatex'
-latex_logo = './_images/Ul_Red.png'
+latex_logo = './_images/UL_Solutions.png'
 
 latex_elements = {
     'fontenc': '\\usepackage{fontspec}',

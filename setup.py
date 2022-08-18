@@ -20,6 +20,7 @@ setup(name=name,
               'source_dir': ('setup.py', 'docs/source')
           }
       },
+
       description='Lecroy oscilloscope driver',
       long_description=long_description,
       long_description_content_type='text/markdown',
@@ -27,8 +28,6 @@ setup(name=name,
       classifiers=[
         'License :: OSI Approved ::  Massachusetts Institute of Technology (MIT)',
         'Operating System :: Microsoft :: Windows',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Topic :: Device driver',
         'Intended Audience :: Developers',
@@ -39,12 +38,12 @@ setup(name=name,
       },
 
       keywords='lecroy',
-      
+
       url='https://git.ul-ts.com/ims-se/hardware-team/pybench/pylecroy',
       author='Laurent Bonnet',
       author_email='laurent.bonnet@ul.com',
-      python_requires='>=3.6',
+      python_requires='>=3.8',
       license='MIT',
       packages=find_packages(),
-      install_requires=['numpy', 'pywin32==300', 'matplotlib'],
+      install_requires=['numpy', 'pywin32', 'matplotlib'],
       zip_safe=False)
