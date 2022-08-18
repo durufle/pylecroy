@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+import logging
 import win32com.client
 
 
@@ -156,6 +157,7 @@ class Lecroy:
         self._instance = None
         self._mode = None
         self._timeout = None
+        self._logger = logging.getLogger(__name__)
         self.open(address)
 
     def __del__(self):
@@ -237,10 +239,10 @@ class Lecroy:
     # ----------------------------------------------------------------------- #
     # HARDCOPY - Printing the Display/Screen Capture
     # ----------------------------------------------------------------------- #
-
-    def get_hardcopy(self) -> dict:
+    @property
+    def hardcopy(self) -> dict:
         """
-        Get all hardcopy setup
+        Hardcopy setup
 
         :return: return the complete of hardware setup as a dict.
         """
@@ -248,13 +250,9 @@ class Lecroy:
             result = self._instance.ReadString(5000).split(',')
             return dict(zip(result[::2], result[1::2]))
 
-    def set_hardcopy(self, config: dict):
-        """
-        Set hardcopy parameter from dictionnary
-
-        :param config: A dictionnary containing one or several harcopy paramterer
-        """
-        # convert dictionnary into list
+    @hardcopy.setter
+    def hardcopy(self, config: dict):
+        # convert dictionary into list
         new_list = zip(config.keys(), config.values())
         new_list = list(new_list)
 
@@ -308,17 +306,18 @@ class Lecroy:
         self._instance.SetupWaveformTransfer(first_point, 0, segment)
 
     # ----------------------------------------------------------------------- #
-
-    def get_waveform_transfer(self):
+    @property
+    def waveform_transfer(self):
         """
         Get Waveform setup information
 
-        :return: A dictionnary
+        :return: A dictionary
         :rtype: dict
 
         """
         if self._instance.WriteString("WFSU?", True):
             value = self._instance.ReadString(50)
+            self._logger.debug(value)
             setup = {}
             (setup["Sparsing"]) = self._instance.GetCommaDelimitedString(value, 1)
             (setup["Number"]) = self._instance.GetCommaDelimitedString(value, 3)
@@ -632,7 +631,6 @@ class Lecroy:
         Enable / Disable Auto calibration
 
         :param state: ON or OFF
-
         :exception: ValueError: Auto calibration state value not supported
         """
         if state not in Calibration.STATES:

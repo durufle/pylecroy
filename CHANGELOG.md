@@ -1,5 +1,10 @@
 **unreleased**
 
+- Add logger
+- get_hardcopy and get_waveform_transfer methods are now properties (getter)
+- set_hardcopy is now a setter
+- python wheel now embed the platform name (windows)
+
 **v1.0.0**
 
 - Replace **show_trace** method by **display_channel**
@@ -11,7 +16,7 @@
 - Remove logging package dependency
 - Remove version constant in Lecroy class
 - Remove **show_message** method.
-- **get_hardcopy** method return parameters in dictionnary format
+- **get_hardcopy** method return parameters in dictionary format
 - Defined constant classes
 - Defined getter: identifier, display, grid, auto_cal, mode
 - Defined setter: display, grid, auto_cal, mode

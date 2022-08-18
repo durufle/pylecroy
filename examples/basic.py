@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import Lecroy
-from pylecroy.pylecroy import Channels
-
+from pylecroy.pylecroy import *
+import numpy as np
+import matplotlib.pyplot as plt
 import sys
 
 VERSION = '0.1.0'
 
-USAGE = '''
-Return information from Lecroy
-
+USAGE = '''basic: basic usage
 Usage:
-    python lecroy_info.py -a "IP:10.67.16.22"
-    python lcry_info.py -a "IP:10.67.16.22"
-    python lcry_info.py -a "USBTMC:<Host Name>"
-    ...
-        
+    python basic.py -a "IP:10.67.16.22"
+
 Options:
     -h, --help              this help message.
     -v, --version           version info.
@@ -29,7 +24,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(argv, 'hvla:', ['help', 'version', 'address='])
+        opts, args = getopt.gnu_getopt(argv, 'hva:', ['help', 'version', 'address='])
         address = None
 
         for o, a in opts:
@@ -62,7 +57,9 @@ def main(argv=None):
     print(f"get auto calibration         : {scope.auto_calibration}")
     print(f"Display state                : {scope.display}")
     print(f"Grid mode                    : {scope.grid}")
-
+    print(f"Sequence condition           : {scope.sequence}")
+    print(f"Waveform Transfer            : {scope.waveform_transfer}")
+    print(f"Hardcopy                     : {scope.hardcopy}")
     scope.close()
 
 
