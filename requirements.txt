@@ -1,7 +1,7 @@
 sphinx
 numpy
 matplotlib
-pywin32
+pywin32==300
 wheel
 devpi-client==5.2.3
 bump2version
