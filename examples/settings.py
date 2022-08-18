@@ -59,7 +59,7 @@ def main(argv=None):
     trigger = scope.trigger_mode
     print(f"Trigger mode             : {trigger}")
     for mode in Trigger.Modes:
-        scope.trigger_mode = mode.value
+        scope.trigger_mode = mode
         print(f"Trigger mode             : {scope.trigger_mode}")
 
     # Auto calibration
@@ -71,7 +71,23 @@ def main(argv=None):
     print(f"Auto calibration         : {scope.auto_calibration}")
 
     # Grid
+    print(f"Grid                     : {scope.grid}")
+    for state in Grid.States:
+        scope.grid = state
+        print(f"Grid                     : {scope.grid}")
 
+    scope.grid = Grid.States.SINGLE
+
+    # Display
+    print(f"Display                    {scope.display}")
+    for state in Display.States:
+        scope.display = state
+        print(f"Display                    {scope.display}")
+
+    scope.display_channel(WaveForm.Channels.C1, "OFF")
+    input("-")
+    scope.display = Display.States.ON
+    scope.display_channel("C1", "ON")
     scope.close()
 
 

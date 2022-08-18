@@ -68,7 +68,7 @@ class Grid(Const):
         DUAL = 'DUAL'
         QUAD = 'QUAD'
         OCTAL = 'OCTAL'
-        XY = 'XY'
+        XYONLY = 'XYONLY'
         XYSINGLE = 'XYSINGLE'
         XYDUAL = 'XYDUAL'
         TANDEM = 'TANDEM'
@@ -116,8 +116,8 @@ class Parameters(enum.Enum, metaclass=MyEnumMeta):
 
 class Display(Const):
     class States(enum.Enum, metaclass=MyEnumMeta):
-        ON = "ON"
         OFF = "OFF"
+        ON = "ON"
 
 
 class Setup(Const):
@@ -147,8 +147,8 @@ class Cursor(Const):
 
 class Calibration(Const):
     class States(enum.Enum, metaclass=MyEnumMeta):
-        ON = 'ON'
         OFF = 'OFF'
+        ON = 'ON'
 
 
 class Sequence(Const):
@@ -229,16 +229,16 @@ class Lecroy:
 
     # ----------------------------------------------------------------------- #
     @property
-    def mode(self):
+    def mode(self) -> Remote.Modes:
         """
         Get the current scope mode.
 
         :return: device mode.
         """
-        return self._mode
+        return Remote.Modes(self._mode)
 
     @mode.setter
-    def mode(self, mode):
+    def mode(self, mode: Remote.Modes):
         """
         Set the scope mode (remote or local)
 
@@ -558,16 +558,16 @@ class Lecroy:
     # ----------------------------------------------------------------------- #
 
     @property
-    def display(self):
+    def display(self) -> Display.States:
         """
         Get display mode
         :return: ON or OFF
         """
         if self._instance.WriteString("DISP?", True):
-            return self._instance.ReadString(10)
+            return Display.States(self._instance.ReadString(10))
 
     @display.setter
-    def display(self, state):
+    def display(self, state: Display.States):
         """
         Set display mode
 
@@ -580,19 +580,19 @@ class Lecroy:
         """
         if state not in Display.States:
             raise ValueError("Display state not supported...")
-        cmd = "DISP {0}".format(state)
+        cmd = f"DISP {state.value}"
         self._instance.WriteString(cmd, True)
 
     @property
-    def grid(self):
+    def grid(self) -> Grid.States:
         """
         return the style of grid used
         """
         if self._instance.WriteString("GRID?", True):
-            return self._instance.ReadString(10)
+            return Grid.States(self._instance.ReadString(10))
 
     @grid.setter
-    def grid(self, grid):
+    def grid(self, grid: Grid.States):
         """
         Change scope grid format
 
@@ -601,7 +601,7 @@ class Lecroy:
         """
         if grid not in Grid.States:
             raise ValueError("Grid mode not supported...")
-        cmd = "GRID {0}".format(grid)
+        cmd = "GRID {0}".format(grid.value)
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
             pass
