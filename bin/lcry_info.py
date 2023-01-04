@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from pylecroy.pylecroy import Lecroy
-from pylecroy.pylecroy import Channels
 
 import sys
 

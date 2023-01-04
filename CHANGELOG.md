@@ -1,12 +1,9 @@
 **unreleased**
 
+**v1.0.0**
 - Add logger
 - get_hardcopy and get_waveform_transfer methods are now properties (getter)
 - set_hardcopy is now a setter
-- python wheel now embed the platform name (windows)
-
-**v1.0.0**
-
 - Replace **show_trace** method by **display_channel**
 - Replace **print-screen** method by **screen_dump**
 - Allow connection with TCP/IP, LXI and USBTMC interfaces.

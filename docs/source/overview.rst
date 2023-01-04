@@ -84,6 +84,6 @@ To generate python package in wheel format and generate sphinx documentation loc
 
 .. code-block:: bash
 
-    $ python setup.py bdist_wheel build_sphinx
+    $ python setup.py bdist_wheel --plat-name=win-amd64 build_sphinx
 
 
