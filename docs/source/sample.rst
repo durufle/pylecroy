@@ -80,19 +80,19 @@ Printing the Display/Screen Capture
 
         device = Lecroy(ADDRESS)
         # Get current configuration
-        print("hardcopy : {0}".format(device.get_hardcopy()))
+        print("hardcopy : {0}".format(device.hardcopy))
 
         new_cfg = {'DEV': 'JPEG', 'FORMAT': 'LANDSCAPE'}
-        device.set_hardcopy(new_cfg)
+        device.hardcopy = new_cfg)
 
         # Get current configuration
-        print("hardcopy : {0}".format(device.get_hardcopy()))
+        print("hardcopy : {0}".format(device.hardcopy))
 
         new_cfg = {'DEV': 'BMP', 'FORMAT': 'PORTRAIT'}
-        device.set_hardcopy(new_cfg)
+        device.hardcopy = new_cfg)
 
         # Get current configuration
-        print("hardcopy : {0}".format(device.get_hardcopy()))
+        print("hardcopy : {0}".format(device.hardcopy))
 
         device.close()
 

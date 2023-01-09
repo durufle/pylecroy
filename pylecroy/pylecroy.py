@@ -426,6 +426,24 @@ class Lecroy:
             pass
 
     @property
+    def trigger(self) -> str:
+        if self._instance.WriteString("TRMD?", True):
+            return Trigger.Modes(self._instance.ReadString(80))
+
+    @trigger.setter
+    def trigger(self, mode: str):
+        """
+        Set trigger mode
+
+        :param mode: trigger mode
+        """
+        if mode not in ['AUTO', 'NORM', 'SINGLE', 'STOP']:
+            raise ValueError(f'Param is not a Trigger Modes : {mode}')
+        self._instance.WriteString(f"TRMD {mode}", True)
+        while not self._instance.WaitForOPC():
+            pass
+
+    @property
     def sequence(self):
         """
         Return Conditions for the sequence acquisition
