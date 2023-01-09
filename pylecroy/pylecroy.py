@@ -203,8 +203,7 @@ class Lecroy:
         """
         Create a connection with the device and setup in remote mode
 
-        :param address: IP Address
-        :return:
+        :param address: Device connection
         """
         self._instance = win32com.client.Dispatch("LeCroy.ActiveDSOCtrl.1")
         """ Create Connection with device """
@@ -221,7 +220,6 @@ class Lecroy:
         """
         Close communication with the device. Switch the device in local
         mode before closing.
-
         """
         self.mode = Remote.Modes.LOCAL
         if self._instance.Disconnect():
@@ -233,7 +231,7 @@ class Lecroy:
         """
         Get the current scope mode.
 
-        :return: device mode.
+        :return: Remote mode.
         """
         return Remote.Modes(self._mode)
 
@@ -242,8 +240,7 @@ class Lecroy:
         """
         Set the scope mode (remote or local)
 
-        :param mode:
-        :return:
+        :param mode: Remote mode
         """
         if mode not in Remote.Modes:
             raise ValueError("Not a valid mode...")
@@ -276,7 +273,7 @@ class Lecroy:
     @property
     def hardcopy(self) -> dict:
         """
-        Hardcopy setup
+        Get hardcopy configuration
 
         :return: return the complete of hardware setup as a dict.
         """
@@ -286,6 +283,9 @@ class Lecroy:
 
     @hardcopy.setter
     def hardcopy(self, config: dict):
+        """
+        set hardcopy configuration using a dictionary
+        """
         # convert dictionary into list
         new_list = zip(config.keys(), config.values())
         new_list = list(new_list)
@@ -308,7 +308,6 @@ class Lecroy:
 
         :param name: file name
         :param form: Hardcopy format
-        :return: None
         """
         self._instance.StoreHardcopyToFile(form, "", name)
 
@@ -317,8 +316,6 @@ class Lecroy:
     def screen_dump(self):
         """
         Perform a screen dump. See set_hardcopy method
-
-        :return:
         """
         self._instance.WriteString("SCDP", True)
 
@@ -427,6 +424,11 @@ class Lecroy:
 
     @property
     def trigger(self) -> str:
+        """
+        Get the trigger mode
+
+        :return: trigger mode in ['AUTO', 'NORM', 'SINGLE', 'STOP']
+        """
         if self._instance.WriteString("TRMD?", True):
             return Trigger.Modes(self._instance.ReadString(80))
 
@@ -435,7 +437,7 @@ class Lecroy:
         """
         Set trigger mode
 
-        :param mode: trigger mode
+        :param mode: trigger mode in ['AUTO', 'NORM', 'SINGLE', 'STOP']
         """
         if mode not in ['AUTO', 'NORM', 'SINGLE', 'STOP']:
             raise ValueError(f'Param is not a Trigger Modes : {mode}')
@@ -444,12 +446,11 @@ class Lecroy:
             pass
 
     @property
-    def sequence(self):
+    def sequence(self) -> dict:
         """
         Return Conditions for the sequence acquisition
 
-        :return: Return sequence activation flag, number sequences and memory length
-        :rtype: String
+        :return: Return sequence Mode, number sequences and memory length
         """
         if self._instance.WriteString("SEQUENCE?", True):
             value = self._instance.ReadString(10)

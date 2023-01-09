@@ -1,5 +1,8 @@
 **unreleased**
 
+**v1.1.0**
+- Add additional getter/setter for trigger
+
 **v1.0.0**
 - Add logger
 - get_hardcopy and get_waveform_transfer methods are now properties (getter)
