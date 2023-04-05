@@ -2,6 +2,7 @@
 
 **v1.1.0**
 - Add additional getter/setter for trigger
+- Usage of type union in some setters methods
 - Add properties in lcry_info tool
 - Remove VERSION in examples
 - Remove some test script
