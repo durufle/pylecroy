@@ -11,7 +11,7 @@ Usage:
     
 Options:
     -h, --help              this help message.
-    -a, --address           device IP address
+    -a, --address           device address
 '''
 
 
@@ -49,23 +49,41 @@ def main(argv=None):
     print(f"Identifier               : {scope.identifier}")
 
     # Trigger setting
-    trigger = scope.trigger_mode
-    print(f"Trigger mode             : {trigger}")
+    print(f"Trigger mode             : {scope.trigger_mode}")
     for mode in Trigger.Modes:
         scope.trigger_mode = mode
         print(f"Trigger mode             : {scope.trigger_mode}")
+    scope.trigger_mode = Trigger.Modes.STOP
+
+    trigger = scope.trigger_mode
+    print(f"Trigger mode             : {trigger}")
+    for mode in ['NORM', 'AUTO', 'SINGLE']:
+        scope.trigger_mode = mode
+        print(f"Trigger mode             : {scope.trigger_mode}")
+    scope.trigger_mode = "STOP"
+    print(f"Trigger mode             : {scope.trigger_mode}")
 
     # Auto calibration
-    cal = scope.auto_calibration
-    print(f"Auto calibration         : {cal}")
+    print(f"Auto calibration         : {scope.auto_calibration}")
     scope.auto_calibration = Calibration.States.OFF
     print(f"Auto calibration         : {scope.auto_calibration}")
     scope.auto_calibration = Calibration.States.ON
     print(f"Auto calibration         : {scope.auto_calibration}")
-
+    scope.auto_calibration = 'OFF'
+    print(f"Auto calibration         : {scope.auto_calibration}")
+    scope.auto_calibration = 'ON'
+    print(f"Auto calibration         : {scope.auto_calibration}")
+    scope.auto_calibration = 'OFF'
+    print(f"Auto calibration         : {scope.auto_calibration}")
     # Grid
     print(f"Grid                     : {scope.grid}")
     for state in Grid.States:
+        scope.grid = state
+        print(f"Grid                     : {scope.grid}")
+        time.sleep(0.5)
+    scope.grid = Grid.States.SINGLE
+
+    for state in ['SINGLE', 'QUAD']:
         scope.grid = state
         print(f"Grid                     : {scope.grid}")
         time.sleep(0.5)
@@ -78,7 +96,7 @@ def main(argv=None):
         print(f"Display                    {scope.display}")
 
     scope.display_channel(WaveForm.Channels.C1, "OFF")
-    input("-")
+    input("press enter to continue...")
     scope.display = Display.States.ON
     scope.display_channel("C1", "ON")
     scope.close()

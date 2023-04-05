@@ -13,11 +13,17 @@ if __name__ == '__main__':
 
     # Get scope identifier
     print("scope identifier     : {} ".format(device.identifier))
+    device.display_channel('C1', 'OFF')
 
     # Display channels
     print("Channels  OFF...")
     for channel in [WaveForm.Channels.C1, WaveForm.Channels.C2, WaveForm.Channels.C3, WaveForm.Channels.C4]:
         device.display_channel(channel, "OFF")
+        time.sleep(0.5)
+
+    print("Memories  OFF...")
+    for memory in [WaveForm.Memories.M1, WaveForm.Memories.M2, WaveForm.Memories.M3, WaveForm.Memories.M4]:
+        device.display_channel(memory, "OFF")
         time.sleep(0.5)
 
     print("Channels  ON...")
@@ -32,9 +38,7 @@ if __name__ == '__main__':
 
     device.display_channel(WaveForm.Channels.C1, "ON")
     print("Grid : {0}".format(device.grid))
-
     input("Get a signal on C1 and press a key to continue...")
-
     # grid state
     for state in Grid.States:
         print(f"Grid state : {state.value}")
@@ -66,7 +70,6 @@ if __name__ == '__main__':
     device.hardcopy = new_cfg
     print(f"hardcopy : {device.hardcopy}")
     device.store_hardcopy("C1")
-
     # Preserving and Restoring Waveforms
     print("Set Trigger Single...")
     device.trigger_mode = Trigger.Modes.SINGLE

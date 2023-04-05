@@ -12,7 +12,7 @@ Usage:
     
 Options:
     -h, --help              this help message.
-    -a, --address           device IP address
+    -a, --address           device address
 '''
 
 

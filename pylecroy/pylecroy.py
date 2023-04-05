@@ -4,6 +4,7 @@ import sys
 import logging
 import enum
 import win32com.client
+from typing import Union
 
 
 class CustomException(Exception):
@@ -137,14 +138,6 @@ class HardCopy(Const):
         IDX_FILE = 11
 
 
-class Cursor(Const):
-    class Types(enum.Enum, metaclass=MyEnumMeta):
-        OFF, HREL, HABS, VREL, VABS = ("OFF", "HREL", "HABS", "VREL", "VABS")
-
-    class Readout(enum.Enum, metaclass=MyEnumMeta):
-        ABS, SLOPE, DELTA = ("ABS", "SLOPE", "DELTA")
-
-
 class Calibration(Const):
     class States(enum.Enum, metaclass=MyEnumMeta):
         OFF = 'OFF'
@@ -245,9 +238,8 @@ class Lecroy:
         if mode not in Remote.Modes:
             raise ValueError("Not a valid mode...")
 
-        if self._is_open:
-            if self._instance.SetRemoteLocal(mode.value):
-                self._mode = mode
+        if self._is_open and self._instance.SetRemoteLocal(mode.value):
+            self._mode = mode
 
     # ----------------------------------------------------------------------- #
     @property
@@ -299,7 +291,9 @@ class Lecroy:
         cmd = 'HCSU ' + params
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
-            """"""
+            """
+            Wait OPC
+            """
             pass
 
     # ----------------------------------------------------------------------- #
@@ -400,16 +394,23 @@ class Lecroy:
             return Trigger.Modes(self._instance.ReadString(80))
 
     @trigger_mode.setter
-    def trigger_mode(self, mode: Trigger.Modes):
+    def trigger_mode(self, mode: Union[str, Trigger.Modes]):
         """
         Set trigger mode
 
-        :param mode: trigger mode
+        :param mode: trigger mode in Trigger.Mode or in ['AUTO', 'NORM', 'SINGLE','STOP']
         """
-        if not isinstance(mode, Trigger.Modes):
+        if mode not in Trigger.Modes:
             raise ValueError(f'Param is not a Trigger Modes : {mode}')
-        self._instance.WriteString(f"TRMD {mode.value}", True)
+        if type(mode) is str:
+            trig_mode = mode
+        else:
+            trig_mode = mode.value
+        self._instance.WriteString(f"TRMD {trig_mode}", True)
         while not self._instance.WaitForOPC():
+            """
+            Wait OPC
+            """
             pass
 
     def trigger_arm(self):
@@ -419,7 +420,7 @@ class Lecroy:
         self.trigger_mode = Trigger.Modes.SINGLE
 
     def wait(self, timeout=1):
-        self._instance.WriteString("WAIT {0}".format(timeout), True)
+        self._instance.WriteString(f"WAIT {timeout}", True)
         while not self._instance.WaitForOPC():
             pass
 
@@ -431,7 +432,7 @@ class Lecroy:
         :return: trigger mode in ['AUTO', 'NORM', 'SINGLE', 'STOP']
         """
         if self._instance.WriteString("TRMD?", True):
-            return Trigger.Modes(self._instance.ReadString(80))
+            return self._instance.ReadString(80)
 
     @trigger.setter
     def trigger(self, mode: str):
@@ -472,12 +473,11 @@ class Lecroy:
         :param size: memory length
 
         :note:
-
         The size value can be expressed either as numeric fixed point, exponential, or using standard suffixes
         """
         if mode not in Sequence.Modes:
             raise ValueError("Not a valid mode...")
-        return self._instance.WriteString("SEQUENCE {0},{1},{2}".format(mode, segment, size), True)
+        return self._instance.WriteString(f"SEQUENCE {mode},{segment},{size}", True)
 
     # ----------------------------------------------------------------------- #
     # CURSOR - Performing Measurements
@@ -541,7 +541,7 @@ class Lecroy:
             raise ValueError("Trace selected not supported...")
         if memory not in WaveForm.Memories:
             raise ValueError("Memory selected not supported...")
-        cmd = "STO {0},{1}".format(channel, memory)
+        cmd = f"STO {channel},{memory}"
         return self._instance.WriteString(cmd, True)
 
     # ----------------------------------------------------------------------- #
@@ -559,7 +559,7 @@ class Lecroy:
         if setup not in Setup.Slots:
             raise ValueError("Setup slot selected not supported...")
         cmd = "*RCL {0}".format(setup)
-        return self._instance.WriteString(cmd, True)
+        self._instance.WriteString(cmd, True)
 
     def save_setup(self, setup):
         """
@@ -583,17 +583,17 @@ class Lecroy:
     def display(self) -> Display.States:
         """
         Get display mode
-        :return: ON or OFF
+        :return: Display.States.ON or Display.States.OFF
         """
         if self._instance.WriteString("DISP?", True):
             return Display.States(self._instance.ReadString(10))
 
     @display.setter
-    def display(self, state: Display.States):
+    def display(self, state:Union[str, Display.States]):
         """
         Set display mode
 
-        :param state: ON or OFF
+        :param state: 'ON' or 'OFF' or Display.States.ON or Display.States.OFF
         :exception: ValueError: display state value not supported
 
         :notes:
@@ -602,7 +602,11 @@ class Lecroy:
         """
         if state not in Display.States:
             raise ValueError("Display state not supported...")
-        cmd = f"DISP {state.value}"
+        if type(state) is str:
+            display_state = state
+        else:
+            display_state = state.value
+        cmd = f"DISP {display_state}"
         self._instance.WriteString(cmd, True)
 
     @property
@@ -614,7 +618,7 @@ class Lecroy:
             return Grid.States(self._instance.ReadString(10))
 
     @grid.setter
-    def grid(self, grid: Grid.States):
+    def grid(self, grid: Union[str, Grid.States]):
         """
         Change scope grid format
 
@@ -623,10 +627,16 @@ class Lecroy:
         """
         if grid not in Grid.States:
             raise ValueError("Grid mode not supported...")
-        cmd = "GRID {0}".format(grid.value)
+        if type(grid) is str:
+            grd = grid
+        else:
+            grd = grid.value
+        cmd = "GRID {0}".format(grd)
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
-            """"""
+            """
+            Wait OPC
+            """
             pass
 
     def display_channel(self, name, state):
@@ -640,12 +650,26 @@ class Lecroy:
         if name not in WaveForm.Channels and name not in WaveForm.Zooms and name not in WaveForm.Functions and \
                 name not in WaveForm.Memories:
             raise ValueError("Channel name selected not supported...")
+
+        if isinstance(name, str):
+            chn = name
+        else:
+            chn = name.value
+
         if state not in Display.States:
             raise ValueError("state selected not supported...")
-        cmd = "{0}:TRA {1}".format(name, state)
+
+        if isinstance(state, str):
+            sts = state
+        else:
+            sts = state.value
+
+        cmd = "{0}:TRA {1}".format(chn, sts)
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
-            """"""
+            """
+            Wait OPC
+            """
             pass
 
     # ----------------------------------------------------------------------- #
@@ -670,6 +694,9 @@ class Lecroy:
         if self._instance.WriteString("*CAL?", True):
             # Waiting scope available...
             while not self._instance.WaitForOPC():
+                """
+                Wait OPC
+                """
                 pass
 
     @property
@@ -684,16 +711,20 @@ class Lecroy:
             return Calibration.States(self._instance.ReadString(3))
 
     @auto_calibration.setter
-    def auto_calibration(self, state: Calibration.States):
+    def auto_calibration(self, state: Union[str, Calibration.States]):
         """
         Enable / Disable Auto calibration
 
-        :param state: ON or OFF
+        :param state: ON or OFF or Calibration.States.ON or Calibration.States.OFF
         :exception: ValueError: Auto calibration state value not supported
         """
-        if not isinstance(state, Calibration.States):
+        if state not in Calibration.States:
             raise ValueError(f'Param is not a Calibration states : {state}')
-        cmd = "ACAL {0}".format(state.value)
+        if type(state) is str:
+            auto_state = state
+        else:
+            auto_state = state.value
+        cmd = f"ACAL {auto_state}"
         self._instance.WriteString(cmd, True)
 
     @property

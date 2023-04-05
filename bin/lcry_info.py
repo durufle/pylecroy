@@ -60,6 +60,7 @@ def main(argv=None):
     print(f"Scope identifier             : {scope.identifier}")
     print(f"Scope mode                   : {scope.mode}")
     print(f"Trigger mode                 : {scope.trigger_mode}")
+    print(f"Trigger                      : {scope.trigger}")
     print(f"Auto calibration             : {scope.auto_calibration}")
     print(f"Display state                : {scope.display}")
     print(f"Grid mode                    : {scope.grid}")
