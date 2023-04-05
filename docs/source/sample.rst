@@ -37,32 +37,32 @@ This command domain allow to control the Display
 .. code-block:: python
 
     from pylecroy.pylecroy import Lecroy
-    from pylecroy.pylecroy import TriggerModes
-    from pylecroy.pylecroy import Channels
+    from pylecroy.pylecroy import Trigger
+    from pylecroy.pylecroy import WaveForm
 
     ADDRESS= "USBTMC:USB0:00x5ff::0x1023::2814N63170::INSTR"
 
     if __name__ == '__main__':
-        device = Lecroy(ADDRESS)
+        scope = Lecroy(ADDRESS)
         # Display channels
         print("Channels  ON...")
-        for channel in [Channels.C1, Channels.C2, Channels.C3, Channels.C4]:
-            device.display_channel(channel, "ON")
-         device.close()
+        for channel in [WaveForm.Channels.C1, WaveForm.Channels.C2, WaveForm.Channels.C3, WaveForm.Channels.C4]:
+            scope.display_channel(channel, "ON")
+         scope.close()
         ...
         print("Channels  OFF...")
-        for channel in [Channels.C1, Channels.C2, Channels.C3, Channels.C4]:
-            device.display_channel(channel, "OFF")
+        for channel in [WaveForm.Channels.C1, WaveForm.Channels.C2, WaveForm.Channels.C3, WaveForm.Channels.C4]:
+            scope.display_channel(channel, "OFF")
         ...
         print("Channels  C1,C2,C3 ON...")
-        device.display_channel(Channels.C1, "ON")
+        scope.display_channel(WaveForm.Channels.C1, "ON")
         ...
         # Grid
-        for state in GridStates.STATES:
+        for state in Grid.States:
             print("Grid state : " + state)
-            device.grid = state
+            scope.grid = state
             time.sleep(0.5)
-        device.grid = GridStates.SINGLE
+        scope.grid = Grid.States.SINGLE
 
 
 Printing the Display/Screen Capture
@@ -71,30 +71,28 @@ Printing the Display/Screen Capture
 .. code-block:: python
 
     from pylecroy.pylecroy import Lecroy
-    from pylecroy.pylecroy import TriggerModes
-    from pylecroy.pylecroy import Channels
 
     ADDRESS= "USBTMC:USB0:00x5ff::0x1023::2814N63170::INSTR"
 
     if __name__ == '__main__':
 
-        device = Lecroy(ADDRESS)
+        scope = Lecroy(ADDRESS)
         # Get current configuration
         print("hardcopy : {0}".format(device.hardcopy))
 
         new_cfg = {'DEV': 'JPEG', 'FORMAT': 'LANDSCAPE'}
-        device.hardcopy = new_cfg)
+        scope.hardcopy = new_cfg
 
         # Get current configuration
         print("hardcopy : {0}".format(device.hardcopy))
 
         new_cfg = {'DEV': 'BMP', 'FORMAT': 'PORTRAIT'}
-        device.hardcopy = new_cfg)
+        scope.hardcopy = new_cfg
 
         # Get current configuration
         print("hardcopy : {0}".format(device.hardcopy))
 
-        device.close()
+        scope.close()
 
 Preserving and Restoring Waveforms
 ==================================
@@ -102,23 +100,22 @@ Preserving and Restoring Waveforms
 .. code-block:: python
 
     from pylecroy.pylecroy import Lecroy
-    from pylecroy.pylecroy import TriggerModes
-    from pylecroy.pylecroy import Channels
+    from pylecroy.pylecroy import WaveForm
 
     ADDRESS= "USBTMC:USB0:00x5ff::0x1023::2814N63170::INSTR"
 
     if __name__ == '__main__':
 
-        device = Lecroy(ADDRESS)
+        scope = Lecroy(ADDRESS)
         input("Get a signal on C1 and press a key to continue...")
 
         print("ShowChannels C1...")
-        scope.display_channel(Channels.C1, "ON")
+        scope.display_channel(WaveForm.Channels.C1, "ON")
 
         # save C1 to M1
         print("Channel C1 save in M1...")
-        device.save_memory(Channels.C1, Memories.M1)
+        scope.save_memory(WaveForm.Channels.C1, WaveForm.Memories.M1)
         print("Show M1...")
-        device.display_channel(Memories.M1, "ON")
+        scope.display_channel(WaveForm.Memories.M1, "ON")
         ...
 

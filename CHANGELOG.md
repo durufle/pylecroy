@@ -2,6 +2,9 @@
 
 **v1.1.0**
 - Add additional getter/setter for trigger
+- Add properties in lcry_info tool
+- Remove VERSION in examples
+- Remove some test script
 
 **v1.0.0**
 - Add logger

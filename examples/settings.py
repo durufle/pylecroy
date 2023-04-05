@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
+
+from pylecroy.pylecroy import Lecroy, Grid, Trigger, WaveForm, Calibration, Display
+import sys
 import time
 
-from pylecroy.pylecroy import *
-import numpy as np
-import matplotlib.pyplot as plt
-import sys
-
-VERSION = '0.1.0'
-
-USAGE = '''basic: parameters settings usage
+USAGE = '''settings: parameters settings usage
 Usage:
-    python basic.py -a "IP:10.67.16.22"
-
+    python settings.py -a "IP:10.67.16.22"
+    python settings.py -a VXI11:10.67.0.211
+    
 Options:
     -h, --help              this help message.
-    -v, --version           version info.
     -a, --address           device IP address
 '''
 
@@ -25,15 +21,12 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(argv, 'hva:', ['help', 'version', 'address='])
+        opts, args = getopt.gnu_getopt(argv, 'ha:', ['help', 'address='])
         address = None
 
         for o, a in opts:
             if o in ('-h', '--help'):
                 print(USAGE)
-                return 0
-            if o in ('-v', '--version'):
-                print(VERSION)
                 return 0
             elif o in ('-a', '--address'):
                 address = a
@@ -75,7 +68,7 @@ def main(argv=None):
     for state in Grid.States:
         scope.grid = state
         print(f"Grid                     : {scope.grid}")
-
+        time.sleep(0.5)
     scope.grid = Grid.States.SINGLE
 
     # Display

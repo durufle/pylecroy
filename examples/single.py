@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import *
+from pylecroy.pylecroy import Lecroy, Sequence, Trigger, WaveForm
 import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
 
-VERSION = '0.1.0'
-
 USAGE = '''single: no sequence acquisition mode example
 Usage:
     python single.py -a "IP:10.67.16.22"
-
+    python single.py -a VXI11:10.67.0.211
+    
 Options:
     -h, --help              this help message.
-    -v, --version           version info.
     -a, --address           device IP address
 '''
 
@@ -25,15 +23,12 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(argv, 'hva:', ['help', 'version', 'address='])
+        opts, args = getopt.gnu_getopt(argv, 'ha:', ['help', 'address='])
         address = None
 
         for o, a in opts:
             if o in ('-h', '--help'):
                 print(USAGE)
-                return 0
-            if o in ('-v', '--version'):
-                print(VERSION)
                 return 0
             elif o in ('-a', '--address'):
                 address = a
@@ -81,7 +76,7 @@ def main(argv=None):
     print("Wait for acquisition...")
     scope.wait()
 
-    trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 500000)
+    trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 5000000)
     if trace:
         array.insert(0, np.array(trace, dtype=np.int32))
         plt.plot(array[0])

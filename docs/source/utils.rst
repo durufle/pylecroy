@@ -17,9 +17,10 @@ after package installation.
     Return information from Lecroy
 
     Usage:
-        python lecroy_info.py -a "IP:10.67.16.22"
         python lcry_info.py -a "IP:10.67.16.22"
         python lcry_info.py -a "USBTMC:<Host Name>"
+        python lcry_info.py -a "VXI11:10.67.0.211"
+        python lcry_info.py -a "ALIAS NAME"
 
     Options:
         -h, --help              this help message.

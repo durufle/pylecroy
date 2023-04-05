@@ -296,15 +296,16 @@ class Lecroy:
             fields.append("{0},{1},".format(item, value))
 
         params = ''.join(fields)
-        cmd = 'HCSU ' + params[:-1]
+        cmd = 'HCSU ' + params
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
+            """"""
             pass
 
     # ----------------------------------------------------------------------- #
     def store_hardcopy(self, name, form='BMP'):
         """
-        Store an hardcopy file from scope to PC.
+        Store a hardcopy file from scope to PC.
 
         :param name: file name
         :param form: Hardcopy format
@@ -443,6 +444,8 @@ class Lecroy:
             raise ValueError(f'Param is not a Trigger Modes : {mode}')
         self._instance.WriteString(f"TRMD {mode}", True)
         while not self._instance.WaitForOPC():
+            """
+            """
             pass
 
     @property
@@ -492,7 +495,7 @@ class Lecroy:
             raise ValueError("Not a valid channel...")
         if parameter not in Parameters:
             raise ValueError("Not a valid parameter...")
-        cmd = "{0}:PAVA? {1}".format(name, parameter)
+        cmd = f"{name}:PAVA? {parameter}"
         if self._instance.WriteString(cmd, True):
             return self._instance.ReadString(1000)
 
@@ -623,6 +626,7 @@ class Lecroy:
         cmd = "GRID {0}".format(grid.value)
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
+            """"""
             pass
 
     def display_channel(self, name, state):
@@ -641,6 +645,7 @@ class Lecroy:
         cmd = "{0}:TRA {1}".format(name, state)
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
+            """"""
             pass
 
     # ----------------------------------------------------------------------- #

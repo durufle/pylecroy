@@ -10,9 +10,10 @@ USAGE = '''
 Return information from Lecroy
 
 Usage:
-    python lecroy_info.py -a "IP:10.67.16.22"
     python lcry_info.py -a "IP:10.67.16.22"
     python lcry_info.py -a "USBTMC:<Host Name>"
+    python lcry_info.py -a "VXI11:10.67.0.211"
+    python lcry_info.py -a "ALIAS NAME"
     ...
         
 Options:
@@ -56,13 +57,15 @@ def main(argv=None):
     scope = Lecroy(address)
 
     # Get scope parameters
-    print(f"scope identifier             : {scope.identifier}")
-    print(f"get trigger mode             : {scope.trigger_mode}")
-    print(f"get auto calibration         : {scope.auto_calibration}")
+    print(f"Scope identifier             : {scope.identifier}")
+    print(f"Scope mode                   : {scope.mode}")
+    print(f"Trigger mode                 : {scope.trigger_mode}")
+    print(f"Auto calibration             : {scope.auto_calibration}")
     print(f"Display state                : {scope.display}")
     print(f"Grid mode                    : {scope.grid}")
-
-    scope.close()
+    print(f"Sequence condition           : {scope.sequence}")
+    print(f"Waveform Transfer            : {scope.waveform_transfer}")
+    print(f"Hardcopy                     : {scope.hardcopy}")
 
 
 if __name__ == '__main__':

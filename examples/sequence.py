@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import *
+from pylecroy.pylecroy import Lecroy, WaveForm, Trigger, Sequence, Calibration
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-VERSION = '0.1.0'
-
 USAGE = '''sequence: sequence acquisition mode example
 Usage:
     python sequence.py -a "IP:10.67.16.22"
-
+    python sequence.py -a VXI11:10.67.0.211
+    
 Options:
     -h, --help              this help message.
-    -v, --version           version info.
     -a, --address           device IP address
 '''
 
@@ -24,15 +22,12 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(argv, 'hva:', ['help', 'version', 'address='])
+        opts, args = getopt.gnu_getopt(argv, 'ha:', ['help', 'address='])
         address = None
 
         for o, a in opts:
             if o in ('-h', '--help'):
                 print(USAGE)
-                return 0
-            if o in ('-v', '--version'):
-                print(VERSION)
                 return 0
             elif o in ('-a', '--address'):
                 address = a
@@ -71,7 +66,7 @@ def main(argv=None):
 
     input("Set calibration signal to C1 and Press a key to continue...")
 
-    print("ShowChannels C1...")
+    print("Show Channel C1...")
     scope.display_channel("C1", "ON")
 
     number = 1
