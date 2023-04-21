@@ -80,18 +80,12 @@ class Grid(Const):
 class WaveForm(Const):
     class Channels(enum.Enum, metaclass=MyEnumMeta):
         C1, C2, C3, C4 = ('C1', 'C2', 'C3', 'C4')
-
-    class Zooms(enum.Enum, metaclass=MyEnumMeta):
         Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8 = ('Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8')
-
-    class Functions(enum.Enum, metaclass=MyEnumMeta):
         F1, F2, F3, F4, F5, F6, F7, F8 = ('F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8')
-
-    class Memories(enum.Enum, metaclass=MyEnumMeta):
         M1, M2, M3, M4 = ('M1', 'M2', 'M3', 'M4')
 
     class Modes(enum.Enum, metaclass=MyEnumMeta):
-        BYTE, INTEGER, SCALED, NATIVE = (0, 1, 2, 3)
+        BYTE, INTEGER, SCALED, NATIVE = ('BYTE', 'INTEGER', 'SCALED', 'NATIVE')
 
     class Blocks(enum.Enum, metaclass=MyEnumMeta):
         DESC, TEXT, TIME, DAT1, DAT2, ALL = ("DESC", 'TEXT', 'TIME', 'DAT1', 'DAT2', 'ALL')
@@ -103,22 +97,67 @@ class WaveForm(Const):
         ASCII, BINARY, EXCEL, MATHCAD, MATLAB = ("ASCII", "BINARY", "EXCEL", "MATHCAD", "MATLAB")
 
 
-class Parameters(enum.Enum, metaclass=MyEnumMeta):
-    # Parameters related constants
-    ALL = 'ALL'
-    AMPL = 'AMPL'
-    DELAY = 'DLY'
+class Parameters(Const):
+    class Channels(enum.Enum, metaclass=MyEnumMeta):
+        C1 = "C1"
+        C2 = "C2"
+        C3 = "C3"
+        C4 = "C4"
+        Z1 = "Z1"
+        Z2 = "Z2"
+        Z3 = "Z3"
+        Z4 = "Z4"
+        Z5 = "Z5"
+        Z6 = "Z6"
+        Z7 = "Z7"
+        Z8 = "Z8"
+        F1 = "F1"
+        F2 = "F2"
+        F3 = "F3"
+        F4 = "F4"
+        F5 = "F5"
+        F6 = "F6"
+        F7 = "F7"
+        F8 = "F8"
+        M1 = "M1"
+        M2 = "M2"
+        M3 = "M3"
+        M4 = "M4"
 
-    RISE = 'RISE'
-    FALL = 'FALL'
-    MEAN = 'MEAN'
-    PKPK = 'PKPK'
+    class Param(enum.Enum, metaclass=MyEnumMeta):
+        # Parameters related constants
+        ALL = 'ALL'
+        AMPL = 'AMPL'
+        DELAY = 'DLY'
+
+        RISE = 'RISE'
+        FALL = 'FALL'
+        MEAN = 'MEAN'
+        PKPK = 'PKPK'
 
 
 class Display(Const):
     class States(enum.Enum, metaclass=MyEnumMeta):
         OFF = "OFF"
         ON = "ON"
+
+    class Channels(enum.Enum, metaclass=MyEnumMeta):
+        C1 = "C1"
+        C2 = "C2"
+        C3 = "C3"
+        C4 = "C4"
+        F1 = "F1"
+        F2 = "F2"
+        F3 = "F3"
+        F4 = "F4"
+        F5 = "F5"
+        F6 = "F6"
+        F7 = "F7"
+        F8 = "F8"
+        M1 = "M1"
+        M2 = "M2"
+        M3 = "M3"
+        M4 = "M4"
 
 
 class Setup(Const):
@@ -132,10 +171,6 @@ class HardCopy(Const):
         JPEG = 'JPEG'
         PNG = 'PNG'
         TIFF = 'TIFF'
-
-    class Indexes(enum.Enum, metaclass=MyEnumMeta):
-        IDX_FOLDER = 9
-        IDX_FILE = 11
 
 
 class Calibration(Const):
@@ -191,6 +226,13 @@ class Lecroy:
         if self._is_open:
             self.close()
 
+    @staticmethod
+    def __get_from_type(param: Union[str, enum.Enum]):
+        if type(param) is str:
+            return param
+        else:
+            return param.value
+
     # ----------------------------------------------------------------------- #
     def open(self, address):
         """
@@ -229,7 +271,7 @@ class Lecroy:
         return Remote.Modes(self._mode)
 
     @mode.setter
-    def mode(self, mode: Remote.Modes):
+    def mode(self, mode: Union[str, Remote.Modes]):
         """
         Set the scope mode (remote or local)
 
@@ -238,7 +280,7 @@ class Lecroy:
         if mode not in Remote.Modes:
             raise ValueError("Not a valid mode...")
 
-        if self._is_open and self._instance.SetRemoteLocal(mode.value):
+        if self._is_open and self._instance.SetRemoteLocal(self.__get_from_type(mode)):
             self._mode = mode
 
     # ----------------------------------------------------------------------- #
@@ -325,9 +367,9 @@ class Lecroy:
         :param  first_point: Integer, The index of the first point to transfer (0 = first point).
         :param  segment: Integer, Segment number to transfer (0 = all segments).
 
-        :notes:
-            This method affects how the various GetWaveform functions transfer a waveform. For the majority of cases the
-            default settings will be sufficient. These are Start Transfer at first point, Transfer all data points Transfer all segments.
+        :notes: This method affects how the various GetWaveform functions transfer a waveform. For the majority of
+        cases the default settings will be sufficient. These are Start Transfer at first point, Transfer all data
+        points Transfer all segments.
         """
         self._instance.SetupWaveformTransfer(first_point, 0, segment)
 
@@ -353,32 +395,36 @@ class Lecroy:
 
     # ----------------------------------------------------------------------- #
 
-    def get_wave(self, mode, name, max_bytes):
+    def get_wave(self, mode: Union[str, WaveForm.Modes], channel: Union[str, WaveForm.Channels], max_bytes):
         """
         Get a wave from scope, and return it
 
         :param mode: mode (BYTE, INTEGER, SCALED, NATIVE)
-        :param name: channel name
+        :param channel: channel name
         :param max_bytes: maximum byte
         :return: list of waveform values
 
-        :notes: For NATIVE WaveForm, 12-bit oscilloscopes must use the 16-bit word format. Set maxBytes value as <number of bytes to read> x 2.
+        :notes: For NATIVE WaveForm, 12-bit oscilloscopes must use the 16-bit word format. Set maxBytes value as
+        <number of bytes to read> x 2.
 
         """
         wave = None
         if mode not in WaveForm.Modes:
             raise ValueError("Not a valid get waveform mode...")
-        if name not in WaveForm.Channels:
+        if channel not in WaveForm.Channels:
             raise ValueError("Not a valid channel...")
 
-        if mode == WaveForm.Modes.BYTE:
-            wave = list(self._instance.GetByteWaveform(name, max_bytes, 0))
-        elif mode == WaveForm.Modes.INTEGER:
-            wave = self._instance.GetIntegerWaveform(name, max_bytes, 0)
-        elif mode == WaveForm.Modes.SCALED:
-            wave = self._instance.GetScaledWaveform(name, max_bytes, 0)
-        elif mode == WaveForm.Modes.NATIVE:
-            wave = self._instance.GetNativeWaveform(name, max_bytes, False, 'ALL')
+        mode = self.__get_from_type(mode)
+        channel = self.__get_from_type(channel)
+
+        if mode == 'BYTE':
+            wave = self._instance.GetByteWaveform(channel, max_bytes, 0)
+        elif mode == 'INTEGER':
+            wave = self._instance.GetIntegerWaveform(channel, max_bytes, 0)
+        elif mode == 'SCALED':
+            wave = self._instance.GetScaledWaveform(channel, max_bytes, 0)
+        elif mode == 'NATIVE':
+            wave = self._instance.GetNativeWaveform(channel, max_bytes, False, 'ALL')
         return wave
 
     # ----------------------------------------------------------------------- #
@@ -402,11 +448,7 @@ class Lecroy:
         """
         if mode not in Trigger.Modes:
             raise ValueError(f'Param is not a Trigger Modes : {mode}')
-        if type(mode) is str:
-            trig_mode = mode
-        else:
-            trig_mode = mode.value
-        self._instance.WriteString(f"TRMD {trig_mode}", True)
+        self._instance.WriteString(f"TRMD {self.__get_from_type(mode)}", True)
         while not self._instance.WaitForOPC():
             """
             Wait OPC
@@ -422,6 +464,7 @@ class Lecroy:
     def wait(self, timeout=1):
         self._instance.WriteString(f"WAIT {timeout}", True)
         while not self._instance.WaitForOPC():
+            """ Wait OPC """
             pass
 
     @property
@@ -445,8 +488,7 @@ class Lecroy:
             raise ValueError(f'Param is not a Trigger Modes : {mode}')
         self._instance.WriteString(f"TRMD {mode}", True)
         while not self._instance.WaitForOPC():
-            """
-            """
+            """ Wait OPC """
             pass
 
     @property
@@ -464,7 +506,7 @@ class Lecroy:
             (setup["Size"]) = self._instance.GetCommaDelimitedString(value, 2)
             return setup
 
-    def set_sequence(self, mode, segment, size):
+    def set_sequence(self, mode: Union[str, Sequence.Modes], segment, size):
         """
         Set conditions for the sequence acquisition.
 
@@ -477,26 +519,26 @@ class Lecroy:
         """
         if mode not in Sequence.Modes:
             raise ValueError("Not a valid mode...")
-        return self._instance.WriteString(f"SEQUENCE {mode},{segment},{size}", True)
+        return self._instance.WriteString(f"SEQUENCE {self.__get_from_type(mode)},{segment},{size}", True)
 
     # ----------------------------------------------------------------------- #
     # CURSOR - Performing Measurements
     # ----------------------------------------------------------------------- #
 
-    def get_parameter(self, name, parameter):
+    def get_parameter(self, channel: Union[str, Parameters.Channels], parameter: Union[str, Parameters.Param]):
         """
         Return a channel parameters(s)
 
-        :param name: Channel Name in Channels constant class
+        :param channel: Channel Name in Channels constant class
         :param parameter: Channel Parameter in Parameters class
         :return: Parameter value
         """
-        if name not in WaveForm.Channels and name not in WaveForm.Zooms and name not in WaveForm.Functions:
+        if channel not in Parameters.Channels:
             raise ValueError("Not a valid channel...")
-        if parameter not in Parameters:
+        if parameter not in Parameters.Param:
             raise ValueError("Not a valid parameter...")
-        cmd = f"{name}:PAVA? {parameter}"
-        if self._instance.WriteString(cmd, True):
+
+        if self._instance.WriteString(f"{self.__get_from_type(channel)}:PAVA? {self.__get_from_type(parameter)}", True):
             return self._instance.ReadString(1000)
 
     # ----------------------------------------------------------------------- #
@@ -519,7 +561,6 @@ class Lecroy:
         string captured using the panel property.
 
         :param panel: panel string used
-
         """
         self._instance.SetPanel(panel)
 
@@ -537,7 +578,7 @@ class Lecroy:
         :exception: ValueError: Trace selected not supported...
         :exception: ValueError: Memory selected not supported...
         """
-        if channel not in WaveForm.Channels and channel not in WaveForm.Zooms and channel not in WaveForm.Functions:
+        if channel not in WaveForm.All:
             raise ValueError("Trace selected not supported...")
         if memory not in WaveForm.Memories:
             raise ValueError("Memory selected not supported...")
@@ -545,7 +586,7 @@ class Lecroy:
         return self._instance.WriteString(cmd, True)
 
     # ----------------------------------------------------------------------- #
-    # SAVE/RECALL SETUP - Perserving and Restoring Panel Settings
+    # SAVE/RECALL SETUP - Preserving and Restoring Panel Settings
     # ----------------------------------------------------------------------- #
     def recall_setup(self, setup):
         """
@@ -589,7 +630,7 @@ class Lecroy:
             return Display.States(self._instance.ReadString(10))
 
     @display.setter
-    def display(self, state:Union[str, Display.States]):
+    def display(self, state: Union[str, Display.States]):
         """
         Set display mode
 
@@ -602,12 +643,7 @@ class Lecroy:
         """
         if state not in Display.States:
             raise ValueError("Display state not supported...")
-        if type(state) is str:
-            display_state = state
-        else:
-            display_state = state.value
-        cmd = f"DISP {display_state}"
-        self._instance.WriteString(cmd, True)
+        self._instance.WriteString(f"DISP {self.__get_from_type(state)}", True)
 
     @property
     def grid(self) -> Grid.States:
@@ -627,49 +663,29 @@ class Lecroy:
         """
         if grid not in Grid.States:
             raise ValueError("Grid mode not supported...")
-        if type(grid) is str:
-            grd = grid
-        else:
-            grd = grid.value
-        cmd = "GRID {0}".format(grd)
-        self._instance.WriteString(cmd, True)
+        self._instance.WriteString(f"GRID {self.__get_from_type(grid)}", True)
         while not self._instance.WaitForOPC():
-            """
-            Wait OPC
-            """
+            """ Wait OPC """
             pass
 
-    def display_channel(self, name, state):
+    def display_channel(self, name: Union[str, Display.Channels], state: Union[str, Display.States]):
         """
         Display/ Doesn't display a channel to the scope screen.
 
-        :param name: trace channel number
+        :param name: Channel name
         :param state: ON / OFF
         :return: Write command status
         """
-        if name not in WaveForm.Channels and name not in WaveForm.Zooms and name not in WaveForm.Functions and \
-                name not in WaveForm.Memories:
-            raise ValueError("Channel name selected not supported...")
-
-        if isinstance(name, str):
-            chn = name
-        else:
-            chn = name.value
+        if name not in Display.Channels:
+            raise ValueError(f"Channel {name} selected not supported...")
 
         if state not in Display.States:
             raise ValueError("state selected not supported...")
 
-        if isinstance(state, str):
-            sts = state
-        else:
-            sts = state.value
-
-        cmd = "{0}:TRA {1}".format(chn, sts)
+        cmd = f"{self.__get_from_type(name)}:TRA {self.__get_from_type(state)}"
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
-            """
-            Wait OPC
-            """
+            """ Wait OPC """
             pass
 
     # ----------------------------------------------------------------------- #
@@ -694,9 +710,7 @@ class Lecroy:
         if self._instance.WriteString("*CAL?", True):
             # Waiting scope available...
             while not self._instance.WaitForOPC():
-                """
-                Wait OPC
-                """
+                """ Wait OPC """
                 pass
 
     @property
@@ -720,12 +734,7 @@ class Lecroy:
         """
         if state not in Calibration.States:
             raise ValueError(f'Param is not a Calibration states : {state}')
-        if type(state) is str:
-            auto_state = state
-        else:
-            auto_state = state.value
-        cmd = f"ACAL {auto_state}"
-        self._instance.WriteString(cmd, True)
+        self._instance.WriteString(f"ACAL {self.__get_from_type(state)}", True)
 
     @property
     def identifier(self):

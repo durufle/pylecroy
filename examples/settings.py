@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import Lecroy, Grid, Trigger, WaveForm, Calibration, Display
+from pylecroy.pylecroy import Lecroy, Grid, Trigger, Calibration, Display
 import sys
 import time
 
@@ -55,8 +55,6 @@ def main(argv=None):
         print(f"Trigger mode             : {scope.trigger_mode}")
     scope.trigger_mode = Trigger.Modes.STOP
 
-    trigger = scope.trigger_mode
-    print(f"Trigger mode             : {trigger}")
     for mode in ['NORM', 'AUTO', 'SINGLE']:
         scope.trigger_mode = mode
         print(f"Trigger mode             : {scope.trigger_mode}")
@@ -64,7 +62,6 @@ def main(argv=None):
     print(f"Trigger mode             : {scope.trigger_mode}")
 
     # Auto calibration
-    print(f"Auto calibration         : {scope.auto_calibration}")
     scope.auto_calibration = Calibration.States.OFF
     print(f"Auto calibration         : {scope.auto_calibration}")
     scope.auto_calibration = Calibration.States.ON
@@ -95,10 +92,28 @@ def main(argv=None):
         scope.display = state
         print(f"Display                    {scope.display}")
 
-    scope.display_channel(WaveForm.Channels.C1, "OFF")
-    input("press enter to continue...")
-    scope.display = Display.States.ON
-    scope.display_channel("C1", "ON")
+    # Display channel
+    for channel in Display.Channels:
+        scope.display_channel(channel, Display.States.OFF)
+
+    for channel in Display.Channels:
+        scope.display_channel(channel, Display.States.ON)
+
+    for channel in ["C1", "C2", "C3", "C4", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "M1", "M2", "M3", "M4"]:
+        scope.display_channel(channel, Display.States.OFF)
+
+    for channel in ["C1", "C2", "C3", "C4", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "M1", "M2", "M3", "M4"]:
+        scope.display_channel(channel, Display.States.ON)
+
+    for channel in Display.Channels:
+        scope.display_channel(channel, 'OFF')
+
+    for channel in ["C1", "C2", "C3", "C4", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "M1", "M2", "M3", "M4"]:
+        scope.display_channel(channel, 'ON')
+
+    for channel in ["C1", "C2", "C3", "C4", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "M1", "M2", "M3", "M4"]:
+        scope.display_channel(channel, 'OFF')
+
     scope.close()
 
 

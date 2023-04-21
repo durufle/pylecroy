@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import Lecroy, Sequence, Trigger, WaveForm
+from pylecroy.pylecroy import Lecroy, Sequence, Trigger, Display, WaveForm
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -60,20 +60,17 @@ def main(argv=None):
     scope.trigger_mode = Trigger.Modes.STOP
 
     print("Channels  OFF...")
-    for channel in WaveForm.Channels:
-        scope.display_channel(channel.value, "OFF")
+    for channel in Display.Channels:
+        scope.display_channel(channel, "OFF")
 
-    for memory in WaveForm.Memories:
-        scope.display_channel(memory.value, "OFF")
-
-    print("ShowChannels C1...")
+    print("Display Channel C1...")
     scope.display_channel("C1", "ON")
 
     print("Defined Waveform transfer mode...")
     scope.set_waveform_transfer(first_point=0, segment=0)
     print("Set trigger SINGLE...")
     scope.trigger_mode = Trigger.Modes.SINGLE
-    print("Wait for acquisition...")
+    print("Wait for acquisition...(timeout = 1s) ")
     scope.wait()
 
     trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 5000000)

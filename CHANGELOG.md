@@ -1,5 +1,9 @@
 **unreleased**
 
+- Bug correction on get_wave method. Method parameter use Union
+- Bug correction on WaveForm Modes definition 
+- Redefined constant class for Display and Parameters - Include Channels
+
 **v1.1.0**
 - Add additional getter/setter for trigger
 - Usage of type union in some setters methods

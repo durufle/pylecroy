@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pylecroy.pylecroy import Lecroy, WaveForm, Trigger, Sequence, Calibration
+from pylecroy.pylecroy import Lecroy, WaveForm, Display, Trigger, Sequence, Calibration
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -52,17 +52,14 @@ def main(argv=None):
     scope.trigger_mode = Trigger.Modes.STOP
 
     print("Enable sequence Mode...")
-    scope.set_sequence(Sequence.Modes.ON, 10, 500000)
+    scope.set_sequence(Sequence.Modes.ON, 10, 5000000)
     print("Get sequence setup...")
     seq_setup = scope.sequence
     print(seq_setup)
 
     print("Channels  OFF...")
-    for channel in WaveForm.Channels:
-        scope.display_channel(channel.value, "OFF")
-
-    for memory in WaveForm.Memories:
-        scope.display_channel(memory.value, "OFF")
+    for channel in Display.Channels:
+        scope.display_channel(channel, "OFF")
 
     input("Set calibration signal to C1 and Press a key to continue...")
 
@@ -84,10 +81,10 @@ def main(argv=None):
     print("Set trigger SINGLE...")
     scope.trigger_mode = Trigger.Modes.SINGLE
     print("Wait for acquisition...")
-    scope.wait(timeout=10)
+    scope.wait()
 
     for acquit in range(0, 1):
-        trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 500000)
+        trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 5000000)
         array.insert(acquit, np.array(trace, dtype=np.int32))
         plt.plot(array[acquit])
         plt.title('Acquisition {0}'.format(acquit))
@@ -95,7 +92,7 @@ def main(argv=None):
 
     input("press a key to exit...")
     print("Disable sequence Mode...")
-    scope.set_sequence(Sequence.Modes.OFF, 10, 500000)
+    scope.set_sequence(Sequence.Modes.OFF, 10, 5000000)
 
     scope.close()
 
