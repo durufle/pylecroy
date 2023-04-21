@@ -23,7 +23,7 @@ copyright = '2022, UL Solutions'
 author = 'Laurent Bonnet'
 
 # The full version, including alpha/beta/rc tags
-version = '1.1.0'
+version = '2.0.0'
 release = version
 
 
