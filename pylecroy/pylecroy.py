@@ -1,10 +1,13 @@
-#!/usr/bin/python3
+"""
+pylecroy module
+"""
 
 import sys
 import logging
 import enum
-import win32com.client
+import warnings
 from typing import Union
+import win32com.client
 
 
 class CustomException(Exception):
@@ -34,8 +37,6 @@ class MyEnumMeta(enum.EnumMeta):
             if isinstance(item, str) or isinstance(item, int):
                 return item in [v.value for v in cls.__members__.values()]
 
-            #
-            import warnings
             warnings.warn(
                 "in 3.12 __contains__ will no longer raise TypeError, but will return True if\n"
                 "obj is a member or a member's value",
@@ -49,12 +50,18 @@ class MyEnumMeta(enum.EnumMeta):
 
 
 class Remote(Const):
+    """
+    Remote const class
+    """
     class Modes(enum.Enum, metaclass=MyEnumMeta):
         LOCAL = 0
         REMOTE = 1
 
 
 class Trigger(Const):
+    """
+    Trigger const class
+    """
     class Modes(enum.Enum, metaclass=MyEnumMeta):
         AUTO = 'AUTO'
         NORMAL = 'NORM'
@@ -63,6 +70,9 @@ class Trigger(Const):
 
 
 class Grid(Const):
+    """
+    Grid const class
+    """
     class States(enum.Enum, metaclass=MyEnumMeta):
         AUTO = 'AUTO'
         SINGLE = 'SINGLE'
@@ -78,6 +88,9 @@ class Grid(Const):
 
 
 class WaveForm(Const):
+    """
+    Waveform const class
+    """
     class Channels(enum.Enum, metaclass=MyEnumMeta):
         C1, C2, C3, C4 = ('C1', 'C2', 'C3', 'C4')
         Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8 = ('Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8')
@@ -98,6 +111,9 @@ class WaveForm(Const):
 
 
 class Parameters(Const):
+    """
+    Parameters const class
+    """
     class Channels(enum.Enum, metaclass=MyEnumMeta):
         C1 = "C1"
         C2 = "C2"
@@ -137,6 +153,9 @@ class Parameters(Const):
 
 
 class Display(Const):
+    """
+    Display const class
+    """
     class States(enum.Enum, metaclass=MyEnumMeta):
         OFF = "OFF"
         ON = "ON"
@@ -161,11 +180,17 @@ class Display(Const):
 
 
 class Setup(Const):
+    """
+    Setup const class
+    """
     class Slots(enum.Enum, metaclass=MyEnumMeta):
         S1, S2, S3, S4, S5, S6 = (0, 1, 2, 3, 4, 5)
 
 
 class HardCopy(Const):
+    """
+    Hardcopy const class
+    """
     class Formats(enum.Enum, metaclass=MyEnumMeta):
         BMP = 'BMP'
         JPEG = 'JPEG'
@@ -174,18 +199,27 @@ class HardCopy(Const):
 
 
 class Calibration(Const):
+    """
+    Calibration const class
+    """
     class States(enum.Enum, metaclass=MyEnumMeta):
         OFF = 'OFF'
         ON = 'ON'
 
 
 class Sequence(Const):
+    """
+    Sequence const class
+    """
     class Modes(enum.Enum, metaclass=MyEnumMeta):
         ON = 'ON'
         OFF = 'OFF'
 
 
 class Command(Const):
+    """
+    Command const class
+    """
     class Header(Const):
         class Modes(enum.Enum, metaclass=MyEnumMeta):
             ON = 'ON'
@@ -203,6 +237,9 @@ class Command(Const):
 
 
 class Disk(Const):
+    """
+    Disk const class
+    """
     class Devices(enum.Enum, metaclass=MyEnumMeta):
         HDD = 'HDD'
         USB = 'USB'
@@ -241,7 +278,6 @@ class Lecroy:
         :param address: Device connection
         """
         self._instance = win32com.client.Dispatch("LeCroy.ActiveDSOCtrl.1")
-        """ Create Connection with device """
 
         if self._instance.MakeConnection(address):
             self._is_open = True
@@ -286,6 +322,9 @@ class Lecroy:
     # ----------------------------------------------------------------------- #
     @property
     def timeout(self):
+        """
+        timeout property
+        """
         return self._timeout
 
     @timeout.setter
@@ -327,15 +366,12 @@ class Lecroy:
         fields = []
         for i in new_list:
             item, value = i
-            fields.append("{0},{1},".format(item, value))
+            fields.append(f"{item},{value},")
 
         params = ''.join(fields)
         cmd = 'HCSU ' + params
         self._instance.WriteString(cmd, True)
         while not self._instance.WaitForOPC():
-            """
-            Wait OPC
-            """
             pass
 
     # ----------------------------------------------------------------------- #
@@ -488,7 +524,6 @@ class Lecroy:
             raise ValueError(f'Param is not a Trigger Modes : {mode}')
         self._instance.WriteString(f"TRMD {mode}", True)
         while not self._instance.WaitForOPC():
-            """ Wait OPC """
             pass
 
     @property
@@ -613,7 +648,7 @@ class Lecroy:
         """
         if setup not in Setup.Slots:
             raise ValueError("Setup slot selected not supported...")
-        cmd = "*SAV {0}".format(setup)
+        cmd = f"*SAV {setup}"
         return self._instance.WriteString(cmd, True)
 
     # ----------------------------------------------------------------------- #
@@ -708,9 +743,7 @@ class Lecroy:
         Execute a calibration.
         """
         if self._instance.WriteString("*CAL?", True):
-            # Waiting scope available...
             while not self._instance.WaitForOPC():
-                """ Wait OPC """
                 pass
 
     @property

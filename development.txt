@@ -1,0 +1,5 @@
+bump2version
+pytest
+sphinx
+pylint
+build

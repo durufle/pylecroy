@@ -1,18 +1,32 @@
+"""
+Multiple command module
+"""
+import argparse
+import time
+import sys
 from pylecroy.pylecroy import Lecroy
 from pylecroy.pylecroy import Trigger
 from pylecroy.pylecroy import WaveForm
 from pylecroy.pylecroy import Grid
-import time
+
 
 ADDRESS_USB = "USBTMC:USB0::0x05ff::0x1023::2816N63170::INSTR"
 ADDRESS_TCP = "IP:10.67.0.35"
 ADDRESS_VXI11 = "VXI11:10.67.0.211"
-if __name__ == '__main__':
-    # Connection
-    device = Lecroy(ADDRESS_VXI11)
+
+
+def main():
+    """
+    Main entry
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', '--name', help='device visa name or address.')
+    args = parser.parse_args()
+
+    device = Lecroy(args.name)
 
     # Get scope identifier
-    print("scope identifier     : {} ".format(device.identifier))
+    print(f"scope identifier     : {device.identifier} ")
     device.display_channel('C1', 'OFF')
 
     # Display channels
@@ -37,7 +51,7 @@ if __name__ == '__main__':
         time.sleep(0.5)
 
     device.display_channel(WaveForm.Channels.C1, "ON")
-    print("Grid : {0}".format(device.grid))
+    print(f"Grid : {device.grid}")
     input("Get a signal on C1 and press a key to continue...")
     # grid state
     for state in Grid.States:
@@ -79,3 +93,7 @@ if __name__ == '__main__':
     print("Show M1...")
     device.display_channel(WaveForm.Memories.M1, "ON")
     device.close()
+
+
+if __name__ == '__main__':
+    sys.exit(main())

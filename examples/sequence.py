@@ -1,53 +1,24 @@
-#!/usr/bin/env python3
-
-from pylecroy.pylecroy import Lecroy, WaveForm, Display, Trigger, Sequence, Calibration
+"""
+parameters example module
+"""
+import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
-
-USAGE = '''sequence: sequence acquisition mode example
-Usage:
-    python sequence.py -a "IP:10.67.16.22"
-    python sequence.py -a VXI11:10.67.0.211
-    
-Options:
-    -h, --help              this help message.
-    -a, --address           device address
-'''
+from pylecroy.pylecroy import Lecroy, Trigger, Sequence, Calibration, WaveForm, Display
 
 
-def main(argv=None):
-    import getopt
+def main():
+    """
+    Main entry
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', '--name', help='device visa name or address.')
+    args = parser.parse_args()
 
-    if argv is None:
-        argv = sys.argv[1:]
-    try:
-        opts, args = getopt.gnu_getopt(argv, 'ha:', ['help', 'address='])
-        address = None
+    scope = Lecroy(args.name)
 
-        for o, a in opts:
-            if o in ('-h', '--help'):
-                print(USAGE)
-                return 0
-            elif o in ('-a', '--address'):
-                address = a
-
-    except getopt.GetoptError:
-        e = sys.exc_info()[1]  # current exception
-        sys.stderr.write(str(e) + "\n")
-        sys.stderr.write(USAGE + "\n")
-        return 1
-
-    # Load default value
-    if address is None:
-        sys.stderr.write("scope address must be provide...\n")
-        print(USAGE)
-        return 2
-
-    scope = Lecroy(address)
-
-    # Get scope identifier property
-    print("scope identifier : {} ".format(scope.identifier))
+    print(f"scope identifier : {scope.identifier}")
     print("Set trigger STOP...")
     scope.trigger_mode = Trigger.Modes.STOP
 
@@ -67,7 +38,7 @@ def main(argv=None):
     scope.display_channel("C1", "ON")
 
     number = 1
-    print("Defined Waveform transfer mode... segment = {0}".format(number))
+    print(f"Defined Waveform transfer mode... segment = {number}")
     scope.set_waveform_transfer(first_point=0, segment=number)
     print("Get Waveform setup...")
     wave_setup = scope.waveform_transfer
@@ -87,7 +58,7 @@ def main(argv=None):
         trace = scope.get_wave(WaveForm.Modes.INTEGER, "C1", 5000000)
         array.insert(acquit, np.array(trace, dtype=np.int32))
         plt.plot(array[acquit])
-        plt.title('Acquisition {0}'.format(acquit))
+        plt.title(f'Acquisition {acquit}')
         plt.show()
 
     input("press a key to exit...")
@@ -99,4 +70,3 @@ def main(argv=None):
 
 if __name__ == '__main__':
     sys.exit(main())
-
