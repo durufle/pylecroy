@@ -1,5 +1,5 @@
 """
-parameters example module
+sequence example module
 """
 import sys
 import argparse

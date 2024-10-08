@@ -16,6 +16,9 @@ class CustomException(Exception):
 
 
 class MetaConst(type):
+    """
+    MetaConst class
+    """
     def __getattr__(cls, key):
         return cls[key]
 
@@ -24,6 +27,9 @@ class MetaConst(type):
 
 
 class Const(object, metaclass=MetaConst):
+    """
+    Constant class
+    """
     def __getattr__(self, name):
         return self[name]
 
@@ -32,6 +38,9 @@ class Const(object, metaclass=MetaConst):
 
 
 class MyEnumMeta(enum.EnumMeta):
+    """
+    MyMetaClass class
+    """
     def __contains__(cls, item):
         if not isinstance(item, enum.Enum):
             if isinstance(item, str) or isinstance(item, int):
@@ -403,9 +412,7 @@ class Lecroy:
         :param  first_point: Integer, The index of the first point to transfer (0 = first point).
         :param  segment: Integer, Segment number to transfer (0 = all segments).
 
-        :notes: This method affects how the various GetWaveform functions transfer a waveform. For the majority of
-        cases the default settings will be sufficient. These are Start Transfer at first point, Transfer all data
-        points Transfer all segments.
+        :notes: This method affects how the various GetWaveform functions transfer a waveform. For the majority of cases the default settings will be sufficient. These are Start Transfer at first point, Transfer all data points Transfer all segments.
         """
         self._instance.SetupWaveformTransfer(first_point, 0, segment)
 
@@ -440,9 +447,7 @@ class Lecroy:
         :param max_bytes: maximum byte
         :return: list of waveform values
 
-        :notes: For NATIVE WaveForm, 12-bit oscilloscopes must use the 16-bit word format. Set maxBytes value as
-        <number of bytes to read> x 2.
-
+        :notes: For NATIVE WaveForm, 12-bit oscilloscopes must use the 16-bit word format. Set maxBytes value as <number of bytes to read> x 2.
         """
         wave = None
         if mode not in WaveForm.Modes:
@@ -549,8 +554,7 @@ class Lecroy:
         :param segment: number segment
         :param size: memory length
 
-        :note:
-        The size value can be expressed either as numeric fixed point, exponential, or using standard suffixes
+        :note: The size value can be expressed either as numeric fixed point, exponential, or using standard suffixes
         """
         if mode not in Sequence.Modes:
             raise ValueError("Not a valid mode...")

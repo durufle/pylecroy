@@ -16,18 +16,18 @@ This package is available under devpi server. So you can install it using pip to
 
 .. code-block:: bash
 
-    pip install pylecroy
+    pip install ragnarok-pylecroy
 
 
 .. note::
 
-    Refer to initialize pip application note in order to point on internal devpi server.
+    Refer to initialize pip application note in order to point on internal jfrog server.
 
 You can install it from the wheel distribution package:
 
 .. code-block:: bash
 
-    pip install pylecroy-x.y.z-py3-none-any.whl
+    pip install ragnarok-pylecroy-x.y.z-py3-none-any.whl
 
 .. note::
 
@@ -35,8 +35,8 @@ You can install it from the wheel distribution package:
 
 
 
-Package development
-===================
+Development
+===========
 
 The code of the package is developed under :file:`pylecroy` directory.
 
@@ -68,22 +68,36 @@ Note that package will be used by other people, so stability matters.
     If the implementation is easy to explain, it may be a good idea.
     Namespaces are one honking great idea -- let's do more of those!
 
-All necessary packages need to develop are identifed in the requirements.txt file.
+All necessary packages to develop are identified in the requirements.txt and development.txt files.
 
-After cloning, create a virtual environement, activate it and install necessary package:
-
-.. code-block:: bash
-
-    $ git clone ssh://git@git.ul-ts.com:5022/ims-se/hardware-team/pybench/pylecroy.git
-    $ cd pylecroy
-    $ python -m python3 -m venv venv
-    $ .\venv\Script\activate.bat
-    (venv) $ pip install -r requirements.txt
-
-To generate python package in wheel format and generate sphinx documentation locally:
+Clone the repository under you workspace
 
 .. code-block:: bash
 
-    $ python setup.py bdist_wheel --plat-name=win-amd64 build_sphinx
+    $ cd ./workspace
+    $ ~/workspace $ git clone https://github.com/durufle/pylecroy.git
+
+After cloning, create a virtual environment, activate it and install necessary package:
+
+.. code-block:: bash
+
+    $ ~/workspace $ cd pylecroy
+    $ ~/workspace/pylecroy $ python -m python -m venv venv
+    $ ~/workspace/pylecroy $ source ./venv/bin/activate
+    $ (venv) ~/workspace/pylecroy $
+
+Install al required packages
+
+.. code-block:: bash
+
+    (venv) ~/workspace/pylecroy $ pip install -r requirements.txt
+    (venv) ~/workspace/pylecroy $ pip install -r development.txt
+
+To generate python package
+
+.. code-block:: bash
+
+    (venv) ~/workspace/pylecroy $ python -m build
+
 
 

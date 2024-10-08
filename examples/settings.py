@@ -1,5 +1,5 @@
 """
-setting example module
+settings example module
 """
 
 import sys

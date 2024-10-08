@@ -3,15 +3,15 @@ Utils
 
 Utils script are installed during package installation process
 
-lcry_info
-=========
+lecroy_info
+===========
 
-This utility return some lecroy's parameter. It's useful to check if everything is setup properly
+This utility return some Lecroy's parameter. It's useful to check if everything is setup properly
 after package installation.
 
 .. code-block::
 
-    (venv) lcry_info
+    (venv) lecroy_info
     scope address must be provide...
 
     Return information from Lecroy

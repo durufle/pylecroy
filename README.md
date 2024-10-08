@@ -4,8 +4,6 @@ This package use the [ActiveDSO](https://teledynelecroy.com/support/softwaredown
 
 This version can be used only on Windows station.
 
-
-
 ## Installation
 
 Installation from the Pypi repository:
@@ -20,7 +18,7 @@ clone the repository in your workspace:
 
 ```bash
 cd ./workspace
-~/workspace $ git clone https://github.com/durufle/pylecru.git
+~/workspace $ git clone https://github.com/durufle/pylecroy.git
 ```
 
 select package folder, create a virtual environment and select it:
@@ -38,7 +36,7 @@ Use you preferred IDE to develop (PyCharm,...)
 To build a wheel package:
 
 ```bash
-(venv) ~/workspace/pyrs $ python -m build
+(venv) ~/workspace/pylecroy $ python -m build
 ```
 
 To execute pylint locally you can do the following:
