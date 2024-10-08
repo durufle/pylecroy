@@ -32,7 +32,7 @@ classifiers = [
 ]
 
 [project.scripts]
-lecroy_info = "bin.lcry_info"
+lecroy_info = "bin.lcry_info:main"
 
 [project.urls]
 Home = "https://github.com/durufle/stm32boot"
