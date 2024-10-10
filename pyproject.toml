@@ -13,8 +13,6 @@ readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.8"
 dependencies = [
-    "numpy",
-    "matplotlib",
     "pywin32",
 ]
 
