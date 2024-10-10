@@ -7,6 +7,7 @@ import sys
 from pylecroy.pylecroy import Lecroy
 from pylecroy.pylecroy import Trigger
 from pylecroy.pylecroy import WaveForm
+from pylecroy.pylecroy import Display
 from pylecroy.pylecroy import Grid
 
 
@@ -31,26 +32,26 @@ def main():
 
     # Display channels
     print("Channels  OFF...")
-    for channel in [WaveForm.Channels.C1, WaveForm.Channels.C2, WaveForm.Channels.C3, WaveForm.Channels.C4]:
+    for channel in [Display.Channels.C1, Display.Channels.C2, Display.Channels.C3, Display.Channels.C4]:
         device.display_channel(channel, "OFF")
         time.sleep(0.5)
 
     print("Memories  OFF...")
-    for memory in [WaveForm.Memories.M1, WaveForm.Memories.M2, WaveForm.Memories.M3, WaveForm.Memories.M4]:
+    for memory in [Display.Channels.M1, Display.Channels.M2, Display.Channels.M3, Display.Channels.M4]:
         device.display_channel(memory, "OFF")
         time.sleep(0.5)
 
     print("Channels  ON...")
-    for channel in [WaveForm.Channels.C1, WaveForm.Channels.C2, WaveForm.Channels.C3, WaveForm.Channels.C4]:
+    for channel in [Display.Channels.C1, Display.Channels.C2, Display.Channels.C3, Display.Channels.C4]:
         device.display_channel(channel, "ON")
         time.sleep(0.5)
 
     print("Channels  OFF...")
-    for channel in [WaveForm.Channels.C1, WaveForm.Channels.C2, WaveForm.Channels.C3, WaveForm.Channels.C4]:
+    for channel in [Display.Channels.C1, Display.Channels.C2, Display.Channels.C3, Display.Channels.C4]:
         device.display_channel(channel, "OFF")
         time.sleep(0.5)
 
-    device.display_channel(WaveForm.Channels.C1, "ON")
+    device.display_channel(Display.Channels.C1, "ON")
     print(f"Grid : {device.grid}")
     input("Get a signal on C1 and press a key to continue...")
     # grid state
@@ -76,22 +77,22 @@ def main():
 
     # HARDCOPY - Printing the Display/Screen Capture
     print(f"hardcopy : {device.hardcopy}")
-    new_cfg = {'DEV': 'JPEG', 'FORMAT': 'LANDSCAPE'}
+    new_cfg = {'DEV': 'BMP', 'FORMAT': 'LANDSCAPE'}
     device.hardcopy = new_cfg
     print(f"hardcopy : {device.hardcopy}")
     device.store_hardcopy("C1")
-    new_cfg = {'DEV': 'BMP', 'FORMAT': 'PORTRAIT'}
+    new_cfg = {'DEV': 'JPEG', 'FORMAT': 'PORTRAIT'}
     device.hardcopy = new_cfg
     print(f"hardcopy : {device.hardcopy}")
-    device.store_hardcopy("C1")
+    device.store_hardcopy("C1.jpeg")
     # Preserving and Restoring Waveforms
     print("Set Trigger Single...")
     device.trigger_mode = Trigger.Modes.SINGLE
     # save C1 to M1
     print("Channel C1 save in M1...")
-    device.save_memory(WaveForm.Channels.C1, WaveForm.Memories.M1)
+    device.save_memory(WaveForm.Channels.C1, WaveForm.Channels.M1)
     print("Show M1...")
-    device.display_channel(WaveForm.Memories.M1, "ON")
+    device.display_channel(Display.Channels.M1, "ON")
     device.close()
 
 

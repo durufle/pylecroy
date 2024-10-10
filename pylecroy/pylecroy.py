@@ -101,10 +101,30 @@ class WaveForm(Const):
     Waveform const class
     """
     class Channels(enum.Enum, metaclass=MyEnumMeta):
-        C1, C2, C3, C4 = ('C1', 'C2', 'C3', 'C4')
-        Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8 = ('Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8')
-        F1, F2, F3, F4, F5, F6, F7, F8 = ('F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8')
-        M1, M2, M3, M4 = ('M1', 'M2', 'M3', 'M4')
+        C1 = "C1"
+        C2 = "C2"
+        C3 = "C3"
+        C4 = "C4"
+        Z1 = "Z1"
+        Z2 = "Z2"
+        Z3 = "Z3"
+        Z4 = "Z4"
+        Z5 = "Z5"
+        Z6 = "Z6"
+        Z7 = "Z7"
+        Z8 = "Z8"
+        F1 = "F1"
+        F2 = "F2"
+        F3 = "F3"
+        F4 = "F4"
+        F5 = "F5"
+        F6 = "F6"
+        F7 = "F7"
+        F8 = "F8"
+        M1 = "M1"
+        M2 = "M2"
+        M3 = "M3"
+        M4 = "M4"
 
     class Modes(enum.Enum, metaclass=MyEnumMeta):
         BYTE, INTEGER, SCALED, NATIVE = ('BYTE', 'INTEGER', 'SCALED', 'NATIVE')
@@ -606,7 +626,7 @@ class Lecroy:
     # ----------------------------------------------------------------------- #
     # WAVEFORM TRANSFER - Preserving and Restoring Waveforms
     # ----------------------------------------------------------------------- #
-    def save_memory(self, channel, memory):
+    def save_memory(self, channel: Union[str, WaveForm.Channels], memory):
         """
         Save a trace in an internal memory slot
 
@@ -617,11 +637,11 @@ class Lecroy:
         :exception: ValueError: Trace selected not supported...
         :exception: ValueError: Memory selected not supported...
         """
-        if channel not in WaveForm.All:
+        if channel not in WaveForm.Channels:
             raise ValueError("Trace selected not supported...")
-        if memory not in WaveForm.Memories:
+        if memory not in WaveForm.Channels:
             raise ValueError("Memory selected not supported...")
-        cmd = f"STO {channel},{memory}"
+        cmd = f"STO {self.__get_from_type(channel)},{self.__get_from_type(memory)}"
         return self._instance.WriteString(cmd, True)
 
     # ----------------------------------------------------------------------- #
