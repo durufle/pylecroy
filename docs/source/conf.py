@@ -23,7 +23,7 @@ copyright = '2024, STMicroelectronic'
 author = 'Laurent Bonnet'
 
 # The full version, including alpha/beta/rc tags
-version = '2.0.0'
+version = '2.1.0'
 release = version
 
 

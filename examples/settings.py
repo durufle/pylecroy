@@ -6,6 +6,10 @@ import sys
 import argparse
 import time
 from pylecroy.pylecroy import Lecroy, Grid, Trigger, Calibration, Display
+ADDRESS_USB = "USBTMC:USB0::0x05ff::0x1023::4609N02794::INSTR"
+ADDRESS_TCP = "IP:10.64.61.56"
+ADDRESS_VXI11 = "VXI11:10.64.61.56"
+ADDRESS = ADDRESS_USB
 
 
 def main():
@@ -13,7 +17,7 @@ def main():
     Main entry
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--name', help='device visa name or address.')
+    parser.add_argument('-n', '--name', default=ADDRESS, help='device visa name or address.')
     args = parser.parse_args()
     scope = Lecroy(args.name)
 

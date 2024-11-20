@@ -1,7 +1,10 @@
 **unreleased**
 
-**v2.0.0**
+**v2.1.0**
+- Bug correction on save-memory method
+- Change build package tools environment
 
+**v2.0.0**
 - Bug correction on get_wave method. Method parameter use Union
 - Bug correction on WaveForm Modes definition 
 - Redefined constant class for Display and Parameters - Include Channels
